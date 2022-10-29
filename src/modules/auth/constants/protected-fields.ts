@@ -1,0 +1,39 @@
+export const REGISTER_EXCLUSIVE_FIELDS = [
+  'status',
+  'balance',
+  'roles',
+  'verifiedEmail',
+  'verifiedAccount',
+  'verifiedDocument',
+  'score',
+  'stats',
+  'createdAt',
+  'updatedAt',
+  'createdBy',
+  'isOnline',
+  'onlineAt',
+  'offlineAt',
+  'lastStreamingTime',
+  'streamingStatus'
+];
+
+export const EXCLUSIVE_FIELDS = [
+  'status',
+  'balance',
+  'username',
+  'email',
+  'roles',
+  'verifiedEmail',
+  'verifiedAccount',
+  'verifiedDocument',
+  'score',
+  'stats',
+  'createdAt',
+  'updatedAt',
+  'createdBy',
+  'isOnline',
+  'onlineAt',
+  'offlineAt',
+  'lastStreamingTime',
+  'streamingStatus'
+];

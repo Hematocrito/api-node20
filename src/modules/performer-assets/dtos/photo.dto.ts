@@ -1,0 +1,71 @@
+import { ObjectId } from 'mongodb';
+import { pick } from 'lodash';
+
+export class PhotoDto {
+  _id?: ObjectId;
+
+  performerId?: ObjectId;
+
+  galleryId?: ObjectId;
+
+  fileId?: ObjectId;
+
+  photo?: any;
+
+  type?: string;
+
+  title?: string;
+
+  description?: string;
+
+  status?: string;
+
+  processing?: boolean;
+
+  isSale?: boolean;
+
+  isBought?: boolean;
+
+  price?: number;
+
+  performer?: any;
+
+  gallery?: any;
+
+  isGalleryCover?: boolean;
+
+  createdBy?: ObjectId;
+
+  updatedBy?: ObjectId;
+
+  createdAt?: Date;
+
+  updatedAt?: Date;
+
+  constructor(init?: Partial<PhotoDto>) {
+    Object.assign(
+      this,
+      pick(init, [
+        '_id',
+        'performerId',
+        'galleryId',
+        'fileId',
+        'photo',
+        'type',
+        'title',
+        'description',
+        'status',
+        'processing',
+        'isSale',
+        'isBought',
+        'price',
+        'isGalleryCover',
+        'performer',
+        'createdBy',
+        'updatedBy',
+        'createdAt',
+        'updatedAt'
+      ])
+    );
+  }
+}
