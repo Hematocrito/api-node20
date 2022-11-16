@@ -6,3 +6,5 @@ export const ACCOUNT_NOT_FOUND = 'Sorry, we couldn\'t find your account, please 
 export const USERNAME_HAS_BEEN_TAKEN = 'This username has been taken, please choose another one';
 export const EMAIL_HAS_BEEN_TAKEN = 'This email has been taken, please choose another one';
 export const ACCOUNT_INACTIVE = 'This account is inactive, please contact administrator';
+export const EMAIL_OR_PASSWORD_INCORRECT = 'Email or password is incorrect';
+

@@ -6,13 +6,16 @@ import {
   Controller,
   HttpException,
   forwardRef,
-  Inject
+  Inject,
+  Get,
+  UseGuards,
+  Req
 } from '@nestjs/common';
 import { UserService } from 'src/modules/user/services';
 import { DataResponse } from 'src/kernel';
 import { SettingService } from 'src/modules/settings';
 import {
-  STATUS_INACTIVE
+  STATUS_INACTIVE, STATUS_PENDING_EMAIL_CONFIRMATION
 } from 'src/modules/user/constants';
 import { PerformerService } from 'src/modules/performer/services';
 import { PERFORMER_STATUSES } from 'src/modules/performer/constants';
@@ -25,6 +28,9 @@ import {
   EmailNotVerifiedException,
   AccountInactiveException
 } from '../exceptions';
+import { AuthGuard } from '@nestjs/passport';
+import { EmailOrPasswordIncorrectException } from '../exceptions/email-password-incorrect.exception';
+import { LoginByEmailPayload } from '../payloads/login-by-email.payload';
 
 @Controller('auth')
 export class LoginController {
@@ -99,4 +105,66 @@ export class LoginController {
 
     return DataResponse.ok({ token });
   }
+
+  @Post('login/email')
+  @HttpCode(HttpStatus.OK)
+  public async loginByEmail(
+    @Body() req: LoginByEmailPayload
+  ): Promise<DataResponse<{ token: string }>> {
+    const email = req.email.toLowerCase();
+    const [user, performer] = await Promise.all([
+      this.userService.findOne({ email }),
+      this.performerService.findOne({ email })
+    ]);
+    if (!user && !performer) {
+      throw new HttpException('This account is not found. Please sign up', 404);
+    }
+    const requireEmailVerification = SettingService.getValueByKey('requireEmailVerification');
+    if (
+      (requireEmailVerification && user && user.status === STATUS_PENDING_EMAIL_CONFIRMATION)
+      || (requireEmailVerification && user && !user.verifiedEmail)
+      || (requireEmailVerification && performer && performer.status === PERFORMER_STATUSES.PENDING)
+      || (requireEmailVerification && performer && !performer.verifiedEmail)) {
+      throw new EmailNotVerifiedException();
+    }
+    if ((user && user.status === STATUS_INACTIVE) || (performer && performer.status === PERFORMER_STATUSES.INACTIVE)) {
+      throw new AccountInactiveException();
+    }
+    const [authUser, authPerformer] = await Promise.all([
+      user && this.authService.findBySource({
+        source: 'user',
+        sourceId: user._id,
+        type: 'email'
+      }),
+      performer && this.authService.findBySource({
+        source: 'performer',
+        sourceId: performer._id,
+        type: 'email'
+      })
+    ]);
+    if (!authUser && !authPerformer) {
+      throw new HttpException('This account is not found. Please Sign up', 404);
+    }
+    if (authUser && !this.authService.verifyPassword(req.password, authUser)) {
+      throw new EmailOrPasswordIncorrectException();
+    }
+    if (authPerformer && !this.authService.verifyPassword(req.password, authPerformer)) {
+      throw new EmailOrPasswordIncorrectException();
+    }
+    // TODO - check for user status here
+
+    let token = null;
+    if (authUser) {
+      token = req.remember ? this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 365 }) : this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
+    }
+    if (!authUser && authPerformer) {
+      token = req.remember ? this.authService.generateJWT(authPerformer, { expiresIn: 60 * 60 * 24 * 365 }) : this.authService.generateJWT(authPerformer, { expiresIn: 60 * 60 * 24 * 1 });
+    }
+
+    return DataResponse.ok({ token });
+  }
+
+  @Get('login/google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {}
 }
