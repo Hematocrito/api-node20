@@ -9,7 +9,8 @@ import {
   Inject,
   Get,
   UseGuards,
-  Req
+  Req,
+  Res
 } from '@nestjs/common';
 import { UserService } from 'src/modules/user/services';
 import { DataResponse } from 'src/kernel';
@@ -164,7 +165,75 @@ export class LoginController {
     return DataResponse.ok({ token });
   }
 
+  @Get('login/twitter')
+  @UseGuards(AuthGuard('twitter'))
+  async twitterAuth(@Req() req) {}
+
+  @Get('login/twitter/redirect')
+  @UseGuards(AuthGuard('twitter'))
+  async twitterAuthRedirect(@Req() req, @Res() res) {
+    const [user, performer] = await Promise.all([
+      this.userService.findOne({ email: req.user?.emails[0]?.value }),
+      this.performerService.findOne({ email: req.user?.emails[0]?.value  })
+    ]);
+    if (!user && !performer) {
+      return res.redirect(`${process.env.USER_URL}/oauth/login?error=account_not_found`)
+    }
+
+    const [authUser, authPerformer] = await Promise.all([
+      user && this.authService.findBySource({
+        source: 'user',
+        sourceId: user._id,
+        type: 'email'
+      }),
+      performer && this.authService.findBySource({
+        source: 'performer',
+        sourceId: performer._id,
+        type: 'email'
+      })
+    ]);
+    if (!authUser && !authPerformer) {
+      return res.redirect(`${process.env.USER_URL}/oauth/login?error=account_not_found`)
+    }
+
+    let token = this.authService.generateJWT(authUser || authPerformer, { expiresIn: 60 * 60 * 24 * 1 });
+
+    return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=${authUser ? 'user': 'performer'}`)
+  }
+  
   @Get('login/google')
   @UseGuards(AuthGuard('google'))
   async googleAuth(@Req() req) {}
+
+  @Get('login/google/redirect')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req, @Res() res) {
+    const [user, performer] = await Promise.all([
+      this.userService.findOne({ email: req.user.email }),
+      this.performerService.findOne({ email: req.user.email })
+    ]);
+    if (!user && !performer) {
+      return res.redirect(`${process.env.USER_URL}/oauth/login?error=account_not_found`)
+    }
+
+    const [authUser, authPerformer] = await Promise.all([
+      user && this.authService.findBySource({
+        source: 'user',
+        sourceId: user._id,
+        type: 'email'
+      }),
+      performer && this.authService.findBySource({
+        source: 'performer',
+        sourceId: performer._id,
+        type: 'email'
+      })
+    ]);
+    if (!authUser && !authPerformer) {
+      return res.redirect(`${process.env.USER_URL}/oauth/login?error=account_not_found`)
+    }
+
+    let token = this.authService.generateJWT(authUser || authPerformer, { expiresIn: 60 * 60 * 24 * 1 });
+
+    return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=${authUser ? 'user': 'performer'}`)
+  }
 }

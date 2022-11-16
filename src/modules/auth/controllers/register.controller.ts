@@ -6,7 +6,9 @@ import {
   Controller,
   Get,
   Res,
-  Query
+  Query,
+  Req,
+  UseGuards
 } from '@nestjs/common';
 import { UserService } from 'src/modules/user/services';
 import { DataResponse } from 'src/kernel';
@@ -21,6 +23,8 @@ import { REGISTER_EXCLUSIVE_FIELDS } from '../constants';
 import { AuthCreateDto } from '../dtos';
 import { UserRegisterPayload } from '../payloads';
 import { AuthService } from '../services';
+import { AuthGuard } from '@nestjs/passport';
+import { EmailHasBeenTakenException } from 'src/modules/user/exceptions';
 
 @Controller('auth')
 export class RegisterController {
@@ -83,5 +87,126 @@ export class RegisterController {
     }
 
     return res.redirect(`${process.env.BASE_URL}/auth/login`);
+  }
+
+  @Get('users/register/twitter')
+  @UseGuards(AuthGuard('twitter-register'))
+  async userRegisterTwitter(@Req() req){ }
+
+  @Get('users/register/twitter/redirect')
+  @UseGuards(AuthGuard('twitter-register'))
+  async userRegisterTwitterRedirect(@Req() req, @Res() res) {
+    try{
+      const twitterProfile = req.user;
+
+      const userCreatePayload:any = {
+        name: twitterProfile._json.name,
+        firstName: twitterProfile._json.name,
+        lastName: twitterProfile._json.name,
+        email: twitterProfile.emails[0]?.value,
+        verifiedEmail: true,
+        username: twitterProfile.username
+      };
+      
+      const user = await this.userService.create(userCreatePayload, {
+        status: STATUS_ACTIVE,
+        roles: ROLE_USER
+      });
+    
+      await Promise.all([
+        this.authService.create(new AuthCreateDto({
+          source: 'user',
+          sourceId: user._id,
+          type: 'email',
+          value: Math.random().toString(36),
+          key: twitterProfile.emails[0]?.value
+        })),
+        this.authService.create(new AuthCreateDto({
+          source: 'user',
+          sourceId: user._id,
+          type: 'username',
+          value: Math.random().toString(36),
+          key: twitterProfile.username
+        }))
+      ]);
+
+      const [authUser] = await Promise.all([
+        user && this.authService.findBySource({
+          source: 'user',
+          sourceId: user._id,
+          type: 'email'
+        })
+      ]);
+
+      let token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
+
+      return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=user`)
+    }
+    catch(err){
+      if(err instanceof EmailHasBeenTakenException){
+        return res.redirect(`${process.env.USER_URL}/oauth/login?error=user_has_been_taken`);
+      }
+      return res.redirect(`${process.env.USER_URL}/oauth/login?error=server_error`);
+    } 
+  }
+
+  @Get('users/register/google')
+  @UseGuards(AuthGuard('google-register'))
+  async userRegisterGoogle(@Req() req){ }
+
+  @Get('users/register/google/redirect')
+  @UseGuards(AuthGuard('google-register'))
+  async userRegisterGoogleRedirect(@Req() req, @Res() res) {
+    try{
+      const googleProfile = req.user;
+
+      const userCreatePayload: any = {
+        name: googleProfile.name,
+        firstName: googleProfile.given_name,
+        lastName: googleProfile.family_name,
+        email: googleProfile.email,
+        verifiedEmail: true,
+        username: googleProfile.email.split("@")[0]
+      };
+      const user = await this.userService.create(userCreatePayload, {
+        status: STATUS_ACTIVE,
+        roles: ROLE_USER
+      });
+
+      await Promise.all([
+        this.authService.create(new AuthCreateDto({
+          source: 'user',
+          sourceId: user._id,
+          type: 'email',
+          value: Math.random().toString(36),
+          key: googleProfile.email
+        })),
+        this.authService.create(new AuthCreateDto({
+          source: 'user',
+          sourceId: user._id,
+          type: 'username',
+          value: Math.random().toString(36),
+          key: googleProfile.email.split("@")[0]
+        }))
+      ]);
+
+      const [authUser] = await Promise.all([
+        user && this.authService.findBySource({
+          source: 'user',
+          sourceId: user._id,
+          type: 'email'
+        })
+      ]);
+
+      let token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
+
+      return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=user`);
+    }
+    catch(err){
+      if(err instanceof EmailHasBeenTakenException){
+        return res.redirect(`${process.env.USER_URL}/oauth/login?error=user_has_been_taken`);
+      }
+      return res.redirect(`${process.env.USER_URL}/oauth/login?error=server_error`);
+    } 
   }
 }

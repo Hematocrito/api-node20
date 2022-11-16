@@ -46,6 +46,7 @@ import {
   PERFORMER_MODEL_PROVIDER,
   PERFORMER_PAYMENT_GATEWAY_SETTING_MODEL_PROVIDER
 } from '../providers';
+import { PerformerAddDocumentsPayload } from '../payloads/performer-add-documents.payload';
 
 @Injectable()
 export class PerformerService {
@@ -934,5 +935,34 @@ export class PerformerService {
     });
 
     return true;
+  }
+
+  public async addDocuments(
+    id: string | ObjectId,
+    payload: PerformerAddDocumentsPayload | any
+  ): Promise<any> {
+    const performer = await this.performerModel.findById(id);
+    if (!performer) {
+      throw new EntityNotFoundException();
+    }
+
+    await Promise.all([
+      payload.idVerificationId
+      && this.fileService.addRef(payload.idVerificationId, {
+        itemId: performer._id as any,
+        itemType: REF_TYPE.PERFORMER
+      }),
+      payload.documentVerificationId
+      && this.fileService.addRef(payload.documentVerificationId, {
+        itemId: performer._id as any,
+        itemType: REF_TYPE.PERFORMER
+      }),
+      payload.avatarId && this.fileService.addRef(payload.avatarId, {
+        itemId: performer._id as any,
+        itemType: REF_TYPE.PERFORMER
+      })
+    ]);
+
+    return new PerformerDto(performer);
   }
 }

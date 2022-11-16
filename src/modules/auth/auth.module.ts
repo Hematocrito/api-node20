@@ -15,6 +15,14 @@ import { PerformerRegisterController } from './controllers/performer-register.co
 import { FileModule } from '../file/file.module';
 import { PerformerModule } from '../performer/performer.module';
 
+//Auth external
+import { GoogleStrategy } from './strategies/google.strategy';
+import { GoogleRegisterStrategy } from './strategies/google-register.strategy';
+import { GoogleRegisterPerformerStrategy } from './strategies/google-register-performer.strategy';
+import { TwitterStrategy } from './strategies/twitter.strategy';
+import { TwitterRegisterStrategy } from './strategies/twitter-register.strategy';
+import { TwitterRegisterPerformerStrategy } from './strategies/twitter-register-performer.strategy';
+
 @Module({
   imports: [
     MongoDBModule,
@@ -28,7 +36,13 @@ import { PerformerModule } from '../performer/performer.module';
     AuthService,
     AuthGuard,
     RoleGuard,
-    LoadUser
+    LoadUser,
+    GoogleStrategy,
+    GoogleRegisterStrategy,
+    GoogleRegisterPerformerStrategy,
+    TwitterStrategy,
+    TwitterRegisterStrategy,
+    TwitterRegisterPerformerStrategy
   ],
   controllers: [
     RegisterController,

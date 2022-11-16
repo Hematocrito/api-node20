@@ -15,6 +15,7 @@ import { AppModule } from './app.module';
 import { renderFile } from './kernel/helpers/view.helper';
 import { HttpExceptionLogFilter } from './kernel/logger/http-exception-log.filter';
 import { RedisIoAdapter } from './modules/socket/redis-io.adapter';
+const session = require('express-session');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -27,6 +28,8 @@ async function bootstrap() {
   app.engine('html', renderFile);
   app.set('view engine', 'html');
   app.disable('x-powered-by');
+  app.use(session({ secret: 'melody hensley is my spirit animal' }));
+
 
   // socket io redis - for chat
   app.useWebSocketAdapter(new RedisIoAdapter(app));
