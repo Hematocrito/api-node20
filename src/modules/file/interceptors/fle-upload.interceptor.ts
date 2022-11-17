@@ -15,6 +15,8 @@ import { StringHelper } from 'src/kernel';
 import { FileService } from '../services';
 import { transformException } from '../lib/multer/multer.utils';
 import { IFileUploadOptions } from '../lib';
+var aws = require('aws-sdk');
+var multerS3 = require('multer-s3');
 
 export function FileUploadInterceptor(
   type = 'file',
@@ -44,29 +46,43 @@ export function FileUploadInterceptor(
       const ctx = context.switchToHttp();
       // todo - support other storage type?
       const { uploadDir } = this;
-      const storage = multer.diskStorage({
-        destination(req, file, cb) {
-          cb(null, uploadDir);
-        },
-        filename(req, file, cb) {
-          if (options.fileName) {
-            return cb(null, options.fileName);
-          }
 
-          const ext = (
-            StringHelper.getExt(file.originalname) || ''
-          ).toLocaleLowerCase();
-          const orgName = StringHelper.getFileName(file.originalname, true);
-          const randomText = StringHelper.randomString(5); // avoid duplicated name, we might check file name first?
-          const name = StringHelper.createAlias(
-            `${randomText}-${orgName}`
-          ).toLocaleLowerCase() + ext;
-          return cb(null, name);
-        }
-      });
+      var s3 = new aws.S3({
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_SECRET,
+        Bucket: process.env.AWS_S3_BUCKET
+      })
+      
       const upload = multer({
-        storage
+        storage: multerS3({
+          s3: s3,
+          bucket: process.env.AWS_S3_BUCKET,
+          contentType: multerS3.AUTO_CONTENT_TYPE,
+          metadata: function (req, file, cb) {
+            cb(null, { fieldName, });
+          },
+          key(req, file, cb) {
+            if (options.fileName) {
+              return cb(null, options.fileName);
+            }
+  
+            const ext = (
+              StringHelper.getExt(file.originalname) || ''
+            ).toLocaleLowerCase();
+            const orgName = StringHelper.getFileName(file.originalname, true);
+            const randomText = StringHelper.randomString(5); // avoid duplicated name, we might check file name first?
+            let name = StringHelper.createAlias(
+              `${randomText}-${orgName}`
+            ).toLocaleLowerCase() + ext;
+
+            if(uploadDir)
+              name = uploadDir+"/"+name;
+
+            return cb(null, name);
+          }
+        })
       }).single(fieldName);
+      
       await new Promise((resolve, reject) => upload(ctx.getRequest(), ctx.getResponse(), (err: any) => {
         if (err) {
           const error = transformException(err);

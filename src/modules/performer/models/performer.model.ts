@@ -62,6 +62,8 @@ export class PerformerModel extends Document {
 
   yearlyPrice: number;
 
+  biannualPrice?: number;
+
   stats: {
     likes: number;
     subscribers: number;
@@ -73,6 +75,8 @@ export class PerformerModel extends Document {
     totalStreamTime: number;
     totalTokenEarned: number;
     totalTokenSpent: number;
+    totalFeeds: number;
+    totalStories: number
   };
 
   score: number;
@@ -122,4 +126,5 @@ export class PerformerModel extends Document {
   bodyType: string;
 
   dateOfBirth: Date;
+
 }

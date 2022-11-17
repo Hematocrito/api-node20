@@ -150,12 +150,15 @@ export class PerformerService {
   }
 
   public async findByIds(ids: any[]) {
-    return this.performerModel
+    const performers = await this.performerModel
       .find({
         _id: {
           $in: ids
         }
-      });
+      })
+      .lean()
+      .exec();
+    return performers.map((p) => new PerformerDto(p));
   }
 
   public async getDetails(id: string | ObjectId, jwtToken: string): Promise<PerformerDto> {

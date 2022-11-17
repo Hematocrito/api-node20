@@ -1,7 +1,9 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { ConfigService } from 'nestjs-config';
+import { S3 } from 'aws-sdk';
+
 import {
   StringHelper,
   QueueEventService,
@@ -85,9 +87,10 @@ export class FileService {
 
   public async createFromMulter(
     type: string,
-    multerData: IMulterUploadedFile,
+    multerData: IMulterUploadedFile | any,
     options?: IFileUploadOptions
   ): Promise<FileDto> {
+    console.log(multerData)
     // eslint-disable-next-line no-param-reassign
     options = options || {};
     const publicDir = this.config.get('file.publicDir');
@@ -95,47 +98,47 @@ export class FileService {
     const thumbnails = [];
     let blurImagePath = '';
     // replace new photo without exif, ignore video
-    if (multerData.mimetype.includes('image')) {
-      const buffer = await this.imageService.replaceWithoutExif(multerData.path);
-      let thumbBuffer = null;
-      let blurBuffer = null;
-      if (options.generateThumbnail) {
-        thumbBuffer = await this.imageService.createThumbnail(
-          multerData.path,
-          options?.thumbnailSize || { width: 250, height: 250 }
-        ) as Buffer;
-        const thumbName = `${StringHelper.randomString(5)}_thumb${StringHelper.getExt(multerData.path)}`;
-        !options?.replaceByThumbnail && writeFileSync(join(photoDir, thumbName), thumbBuffer);
-        !options?.replaceByThumbnail && thumbnails.push({
-          thumbnailSize: options.thumbnailSize,
-          path: join(photoDir, thumbName).replace(publicDir, ''),
-          absolutePath: join(photoDir, thumbName)
-        });
+    // if (multerData.mimetype.includes('image')) {
+    //   const buffer = await this.imageService.replaceWithoutExif(multerData.path);
+    //   let thumbBuffer = null;
+    //   let blurBuffer = null;
+    //   if (options.generateThumbnail) {
+    //     thumbBuffer = await this.imageService.createThumbnail(
+    //       multerData.path,
+    //       options?.thumbnailSize || { width: 250, height: 250 }
+    //     ) as Buffer;
+    //     const thumbName = `${StringHelper.randomString(5)}_thumb${StringHelper.getExt(multerData.path)}`;
+    //     !options?.replaceByThumbnail && writeFileSync(join(photoDir, thumbName), thumbBuffer);
+    //     !options?.replaceByThumbnail && thumbnails.push({
+    //       thumbnailSize: options.thumbnailSize,
+    //       path: join(photoDir, thumbName).replace(publicDir, ''),
+    //       absolutePath: join(photoDir, thumbName)
+    //     });
 
-        // generate blur image
-        blurBuffer = await this.imageService.createThumbnail(
-          multerData.path,
-          { width: 30, height: 30 }
-        ) as Buffer;
-      }
-      unlinkSync(multerData.path);
-      writeFileSync(multerData.path, options?.replaceByThumbnail && thumbBuffer ? thumbBuffer : buffer);
-      if (blurBuffer) {
-        blurImagePath = join(photoDir, `${StringHelper.randomString(5)}_small${StringHelper.getExt(multerData.path)}`);
-        writeFileSync(blurImagePath, blurBuffer);
-      }
-    }
+    //     // generate blur image
+    //     blurBuffer = await this.imageService.createThumbnail(
+    //       multerData.path,
+    //       { width: 30, height: 30 }
+    //     ) as Buffer;
+    //   }
+    //   unlinkSync(multerData.path);
+    //   writeFileSync(multerData.path, options?.replaceByThumbnail && thumbBuffer ? thumbBuffer : buffer);
+    //   if (blurBuffer) {
+    //     blurImagePath = join(photoDir, `${StringHelper.randomString(5)}_small${StringHelper.getExt(multerData.path)}`);
+    //     writeFileSync(blurImagePath, blurBuffer);
+    //   }
+    // }
 
     const data = {
       type,
       name: multerData.filename,
       description: '', // TODO - get from options
       mimeType: multerData.mimetype,
-      server: options.server || 'local',
+      server: options.server || 'local' || 's3',
       // todo - get path from public
-      path: multerData.path.replace(publicDir, ''),
-      absolutePath: multerData.path,
-      blurImagePath: blurImagePath.replace(publicDir, ''),
+      path: multerData.location,
+      absolutePath: multerData.key,
+      blurImagePath: multerData.location,
       // TODO - update file size
       size: multerData.size,
       createdAt: new Date(),
@@ -514,4 +517,103 @@ export class FileService {
       throw new EntityNotFoundException();
     }
   }
+
+  async uploadVideo(file) {    
+    const { originalname } = file;
+    const bucketS3 = process.env.AWS_S3_BUCKET;
+    //return await this.uploadS3(file.buffer, bucketS3, originalname);
+
+    const fileUploaded: {} = await this.uploadS3(file.buffer, bucketS3, originalname);
+    const copyFile = Object.assign(fileUploaded)
+    const{Location} = copyFile
+    const fileCreated = await this.fileModel.create({"type":"performer-video","absolutePath":Location});
+    fileCreated.save();
+    
+    return {
+      fileUploaded,
+      fileCreated
+    }
+  }
+
+  async upload(file) {
+    const { originalname } = file;
+    const bucketS3 = process.env.AWS_S3_BUCKET;
+    return await this.uploadS3(file.buffer, bucketS3, originalname);
+  }
+
+  async uploadPhotFeed(file) {
+    const { originalname } = file;
+    const bucketS3 = process.env.AWS_S3_BUCKET;
+    //return await this.uploadS3(file.buffer, bucketS3, originalname);
+
+    const fileUploaded: {} = await this.uploadS3(file.buffer, bucketS3, originalname);
+    const copyFile = Object.assign(fileUploaded)
+    const{Location} = copyFile
+    const fileCreated = await this.fileModel.create({"type":"photo-feed","absolutePath":Location});
+    fileCreated.save();
+    
+    return {
+      fileCreated
+    }
+  }
+
+  async uploadAvatar(file) {
+    const { originalname } = file;
+    const bucketS3 = process.env.AWS_S3_BUCKET;
+    //return await this.uploadS3(file.buffer, bucketS3, originalname);
+
+    const fileUploaded: {} = await this.uploadS3(file.buffer, bucketS3, originalname);
+    const copyFile = Object.assign(fileUploaded)
+    const{Location} = copyFile
+    const fileCreated = await this.fileModel.create({"type":"avatar","absolutePath":Location});
+    fileCreated.save();
+    
+    return {
+      fileUploaded,
+      fileCreated
+    }
+  }
+
+  async uploadCover(file) {
+    const { originalname } = file;
+    const bucketS3 = process.env.AWS_S3_BUCKET;
+    //return await this.uploadS3(file.buffer, bucketS3, originalname);
+
+    const fileUploaded: {} = await this.uploadS3(file.buffer, bucketS3, originalname);
+    const copyFile = Object.assign(fileUploaded)
+    const{Location} = copyFile
+    const fileCreated = await this.fileModel.create({"type":"cover","absolutePath":Location});
+    fileCreated.save();
+    
+    return {
+      fileUploaded,
+      fileCreated
+    }
+  }
+
+  async uploadS3(file, bucket, name) {
+    const s3 = this.getS3();
+    const params = {
+        Bucket: bucket,
+        Key: String(name),
+        Body: file,
+    };
+    return new Promise((resolve, reject) => {
+        s3.upload(params, (err, data) => {
+        if (err) {
+            Logger.error(err);
+            reject(err.message);
+        }
+        resolve(data);
+        });
+    });
+  }
+
+  getS3() {
+    return new S3({
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_SECRET,
+    });
+  } 
+
 }

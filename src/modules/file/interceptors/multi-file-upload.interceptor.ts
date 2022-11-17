@@ -15,6 +15,8 @@ import { StringHelper } from 'src/kernel';
 import { FileService } from '../services';
 import { transformException } from '../lib/multer/multer.utils';
 import { IFileUploadOptions } from '../lib';
+var aws = require('aws-sdk');
+var multerS3 = require('multer-s3');
 
 export interface IMultiFileUpload {
   type: string;
@@ -48,6 +50,7 @@ export function MultiFileUploadInterceptor(data: IMultiFileUpload[], opts = {} a
       // todo - support other storage type?
       const uploadDir = {} as any;
       const fileName = {} as any;
+
       data.forEach((conf) => {
         const { fieldName, options = {} } = conf;
         uploadDir[fieldName] = options.destination || this.config.get('file').publicDir;
@@ -56,30 +59,43 @@ export function MultiFileUploadInterceptor(data: IMultiFileUpload[], opts = {} a
           fileName[fieldName] = options.fileName;
         }
       });
-      const storage = multer.diskStorage({
-        destination(req, file, cb) {
-          cb(null, uploadDir[file.fieldname]);
-        },
-        filename(req, file, cb) {
-          if (fileName[file.fieldname]) {
-            return cb(null, fileName[file.fieldname]);
-          }
 
-          const ext = (
-            StringHelper.getExt(file.originalname) || ''
-          ).toLocaleLowerCase();
-          const orgName = StringHelper.getFileName(file.originalname, true);
-          const randomText = StringHelper.randomString(5); // avoid duplicated name, we might check file name first?
-          const name = StringHelper.createAlias(
-            `${randomText}-${orgName}`
-          ).toLocaleLowerCase() + ext;
-          return cb(null, name);
-        }
-      });
-      const upload = multer({
-        storage
+      var s3 = new aws.S3({
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_SECRET,
+        Bucket: process.env.AWS_S3_BUCKET
       })
-        .fields(data.map((conf) => ({ name: conf.fieldName })));
+
+      const upload = multer({
+        storage: multerS3({
+          s3: s3,
+          bucket: process.env.AWS_S3_BUCKET,
+          contentType: multerS3.AUTO_CONTENT_TYPE,
+          metadata: function (req, file, cb) {
+            cb(null, { fieldName: file.fieldname });
+          },
+          key(req, file, cb) {
+            if (fileName[file.fieldname]) {
+              return cb(null, fileName[file.fieldname]);
+            }
+
+            const ext = (
+              StringHelper.getExt(file.originalname) || ''
+            ).toLocaleLowerCase();
+            const orgName = StringHelper.getFileName(file.originalname, true);
+            const randomText = StringHelper.randomString(5); // avoid duplicated name, we might check file name first?
+            let name = StringHelper.createAlias(
+              `${randomText}-${orgName}`
+            ).toLocaleLowerCase() + ext;
+
+            if(uploadDir[file.fieldname])
+              name = uploadDir[file.fieldname]+"/"+name;
+
+            return cb(null, name);
+          }
+        })
+      }).fields(data.map((conf) => ({ name: conf.fieldName })));
+
       await new Promise<void>((resolve, reject) => upload(ctx.getRequest(), ctx.getResponse(), (err: any) => {
         if (err) {
           const error = transformException(err);
@@ -103,12 +119,14 @@ export function MultiFileUploadInterceptor(data: IMultiFileUpload[], opts = {} a
       const ctxRequest = ctx.getRequest();
       if (!ctxRequest.files) ctxRequest.files = {};
       const files = ctxRequest.files || {} as any;
+
       // store media and overwrite multer file property in request
       // hook user uploader if user logged in?
       if (!opts.uploader && ctxRequest.user) {
         // eslint-disable-next-line no-param-reassign
         opts.uploader = ctxRequest.user;
       }
+
       // do not use promise all here
       // eslint-disable-next-line no-restricted-syntax
       for (const f of data) {

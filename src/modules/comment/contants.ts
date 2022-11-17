@@ -3,7 +3,9 @@ export const OBJECT_TYPE = {
   PERFORMER: 'performer',
   PRODUCT: 'product',
   GALLERY: 'gallery',
-  COMMENT: 'comment'
+  COMMENT: 'comment',
+  FEED: 'feed',
+  STORY: 'story'
 };
 
 export const COMMENT_CHANNEL = 'COMMENT_CHANNEL';

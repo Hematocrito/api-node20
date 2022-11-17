@@ -128,7 +128,7 @@ export class AdminPerformerController {
   @UseGuards(RoleGuard)
   @UseInterceptors(
     FileUploadInterceptor('performer-document', 'file', {
-      destination: getConfig('file').documentDir
+      destination: 'public/documents'
     })
   )
   async uploadPerformerDocument(
@@ -152,10 +152,10 @@ export class AdminPerformerController {
   @UseGuards(RoleGuard)
   @UseInterceptors(
     FileUploadInterceptor('avatar', 'avatar', {
-      destination: getConfig('file').avatarDir,
-      generateThumbnail: true,
-      replaceByThumbnail: true,
-      thumbnailSize: getConfig('image').avatar
+      destination: 'public/avatars',
+      // generateThumbnail: true,
+      // replaceByThumbnail: true,
+      // thumbnailSize: getConfig('image').avatar
     })
   )
   async uploadPerformerAvatar(@FileUploaded() file: FileDto): Promise<any> {

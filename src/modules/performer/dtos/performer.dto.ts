@@ -42,6 +42,7 @@ export interface IPerformerResponse {
     totalStreamTime: number;
     totalTokenEarned: number;
     totalTokenSpent: number;
+    totalFeeds: number;
   };
   verifiedEmail?: boolean;
   verifiedAccount?: boolean;
@@ -166,6 +167,7 @@ export class PerformerDto {
     totalStreamTime: number;
     totalTokenEarned: number;
     totalTokenSpent: number;
+    totalFeeds: number;
   };
 
   score?: number;
@@ -401,7 +403,8 @@ export class PerformerDto {
       lastStreamingTime: this.lastStreamingTime,
       live: this.live,
       streamingStatus: this.streamingStatus,
-      isOnline: this.isOnline
+      isOnline: this.isOnline,
+      languages: this.languages,
     };
   }
 
@@ -414,6 +417,8 @@ export class PerformerDto {
       username: this.username,
       status: this.status,
       gender: this.gender,
+      firstName: this.firstName,
+      lastName: this.lastName,
       country: this.country,
       city: this.city,
       state: this.state,
@@ -449,7 +454,8 @@ export class PerformerDto {
       live: this.live,
       streamingStatus: this.streamingStatus,
       groupChatPrice: this.groupChatPrice,
-      privateChatPrice: this.privateChatPrice
+      privateChatPrice: this.privateChatPrice,
+      blockCountries: this.blockCountries,
     };
   }
 }
