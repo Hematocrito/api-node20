@@ -1073,4 +1073,9 @@ export class OrderService {
       }
     });
   }
+
+  public async findOneOderDetails(payload: any) {
+    const data = await this.orderDetailModel.findOne(payload);
+    return data;
+  }
 }

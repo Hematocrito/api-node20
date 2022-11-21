@@ -69,5 +69,6 @@ export const PRODUCT_TYPE = {
   WALLET: 'wallet',
   TIP: 'tip',
   PRIVATE_CHAT: 'stream_private',
-  GROUP_CHAT: 'stream_group'
+  GROUP_CHAT: 'stream_group',
+  FEED: 'feed'
 };

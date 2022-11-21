@@ -56,6 +56,8 @@ export class UserDto {
 
   isOnline?: boolean;
 
+  isPerformer?: boolean;
+
   stats: {
     totalViewTime: number;
     totalTokenEarned: number;
@@ -89,6 +91,7 @@ export class UserDto {
           'country',
           'verifiedEmail',
           'isOnline',
+          'isPerformer',
           'stats',
           'balance',
           'createdAt',
@@ -113,6 +116,7 @@ export class UserDto {
       email: this.email,
       stats: this.stats,
       isOnline: this.isOnline,
+      isPerformer: this.isPerformer,
       gender: this.gender,
       country: this.country,
       createdAt: this.createdAt,

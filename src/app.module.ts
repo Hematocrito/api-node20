@@ -25,6 +25,7 @@ import { CouponModule } from './modules/coupon/coupon.module';
 import { StreamModule } from './modules/stream/stream.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { StatisticModule } from './modules/statistic/statistic.module';
+import { FeedModule } from './modules/feed/feed.module';
 import { PerformerStoryModule } from './modules/performer-story/story.module';
 import { PayoutRequestModule } from './modules/payout-request/payout.module';
 import { BlockModule } from './modules/block/block.module';
@@ -60,6 +61,7 @@ import { NotifcationModule } from './modules/notification/notifcation.module';
     WalletPackageModule,
     ContactModule,
     StatisticModule,
+    FeedModule,
     PerformerStoryModule,
     PayoutRequestModule,
     BlockModule,

@@ -4,5 +4,6 @@ export const REF_TYPE = {
   PERFORMER: 'performer_document',
   PHOTO: 'photo',
   PRODUCT: 'product',
-  MESSAGE: 'message'
+  MESSAGE: 'message',
+  FEED: 'feed'
 };
