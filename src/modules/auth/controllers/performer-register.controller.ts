@@ -48,14 +48,14 @@ export class PerformerRegisterController {
           type: 'performer-document',
           fieldName: 'idVerification',
           options: {
-            destination: getConfig('file').documentDir
+            destination: 'private'
           }
         },
         {
           type: 'performer-document',
           fieldName: 'documentVerification',
           options: {
-            destination: getConfig('file').documentDir
+            destination: 'private'
           }
         }
       ],
@@ -105,31 +105,35 @@ export class PerformerRegisterController {
         ]);
       }
 
-      // notify to verify email address
-      if (performer.email) {
-        const {
-          email, name, username
-        } = performer;
-        await this.authService.sendVerificationEmail({
-          _id: performer._id,
-          email
-        }, 'email-verification-performer');
+      // // notify to verify email address
+      // if (performer.email) {
+      //   const {
+      //     email, name, username
+      //   } = performer;
+      //   await this.authService.sendVerificationEmail({
+      //     _id: performer._id,
+      //     email
+      //   }, 'email-verification-performer');
 
-        const sendInstruction = SettingService.getValueByKey(
-          SETTING_KEYS.SEND_MODEL_ONBOARD_INSTRUCTION
-        );
-        if (sendInstruction) {
-          await this.mailService.send({
-            subject: 'Model Onboarding Instructions',
-            to: email,
-            data: {
-              name: name || username
-            },
-            template: 'model-onboard-instructions'
-          });
-        }
-      }
+      //   const sendInstruction = SettingService.getValueByKey(
+      //     SETTING_KEYS.SEND_MODEL_ONBOARD_INSTRUCTION
+      //   );
+      //   if (sendInstruction) {
+      //     await this.mailService.send({
+      //       subject: 'Model Onboarding Instructions',
+      //       to: email,
+      //       data: {
+      //         name: name || username
+      //       },
+      //       template: 'model-onboard-instructions'
+      //     });
+      //   }
+      // }
+      console.log("Debug 3")
 
+      const awsRecognize = await this.authService.validateDocumentsRekognition(files.idVerification._id+"", files.documentVerification._id+"")
+      console.log(awsRecognize);
+  
       return DataResponse.ok({
         message: requireEmailVerification ? 'Please verify your account using the verification email sent to you.' : 'Your account is active, please login !'
       });

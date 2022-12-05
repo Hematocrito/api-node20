@@ -16,7 +16,8 @@ import { SETTING_KEYS } from 'src/modules/settings/constants';
 import { AUTH_MODEL_PROVIDER, FORGOT_MODEL_PROVIDER, VERIFICATION_MODEL_PROVIDER } from '../providers/auth.provider';
 import { AuthModel, ForgotModel, VerificationModel } from '../models';
 import { AuthCreateDto, AuthUpdateDto } from '../dtos';
-
+import * as AWS from 'aws-sdk';
+import { FileService } from 'src/modules/file/services';
 @Injectable()
 export class AuthService {
   constructor(
@@ -30,7 +31,8 @@ export class AuthService {
     private readonly verificationModel: Model<VerificationModel>,
     @Inject(FORGOT_MODEL_PROVIDER)
     private readonly forgotModel: Model<ForgotModel>,
-    private readonly mailService: MailerService
+    private readonly mailService: MailerService,
+    private readonly fileService: FileService,
   ) { }
 
   /**
@@ -289,5 +291,48 @@ export class AuthService {
       // eslint-disable-next-line no-await-in-loop
       await verification.save();
     }
+  }
+
+  validateDocumentsRekognition(idVerification: string, idDocumentVerification: string){
+    return new Promise(async (resolve, reject) => {
+      let IDDocument = await this.fileService.findById(idVerification);
+      let verificationDocument = await this.fileService.findById(idDocumentVerification);
+      new AWS.Config({
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_SECRET,
+        region: process.env.AWS_REGION
+      });
+      const client = new AWS.Rekognition();
+      const params = {
+        SourceImage: {
+          S3Object: {
+            Bucket: process.env.AWS_S3_BUCKET,
+            Name: "/"+IDDocument.absolutePath
+          },
+        },
+        TargetImage: {
+          S3Object: {
+            Bucket: process.env.AWS_S3_BUCKET,
+            Name: "/"+verificationDocument.absolutePath
+          },
+        },
+        SimilarityThreshold: 0
+      }
+      client.compareFaces(params, function(err, response) {
+        console.log({err})
+        console.log({response})
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+          // response.FaceMatches.forEach(data => {
+          //   console.log("Result Recognition")
+          //   let position   = data.Face.BoundingBox
+          //   let similarity = data.Similarity
+          //   console.log(`The face at: ${position.Left}, ${position.Top} matches with ${similarity} % confidence`)
+          // }) // for response.faceDetails
+        } // if
+      });
+    });
   }
 }
