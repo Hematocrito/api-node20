@@ -1,5 +1,4 @@
-FROM public.ecr.aws/docker/library/alpine:latest
-#FROM node:14-alpine
+FROM node:14-alpine
 
 #Argumentos DockerFile
 
@@ -27,4 +26,5 @@ COPY ./docker/supervisord/supervisord.conf /etc/supervisord.conf
 
 #Iniciar supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+RUN service nginx restart
 
