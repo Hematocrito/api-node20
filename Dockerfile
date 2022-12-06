@@ -1,4 +1,5 @@
-FROM node:14-alpine
+FROM public.ecr.aws/docker/library/alpine:latest
+#FROM node:14-alpine
 
 #Argumentos DockerFile
 
