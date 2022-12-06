@@ -26,5 +26,6 @@ COPY ./docker/supervisord/supervisord.conf /etc/supervisord.conf
 
 #Iniciar supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
-RUN systemctl restart nginx
+RUN systemctl -l enable nginx
+RUN systemctl -l start nginx
 
