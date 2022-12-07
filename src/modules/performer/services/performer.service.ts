@@ -88,6 +88,10 @@ export class PerformerService {
     return data;
   }
 
+  public async update(id: string, data: any): Promise<void> {
+    await this.performerModel.updateOne({_id: id} , data);
+  }
+
   public async getBankingSettings(performerId: ObjectId) {
     return this.bankingSettingModel.findOne({
       performerId

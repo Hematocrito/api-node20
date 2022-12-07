@@ -307,31 +307,24 @@ export class AuthService {
         SourceImage: {
           S3Object: {
             Bucket: process.env.AWS_S3_BUCKET,
-            Name: "/"+IDDocument.absolutePath
+            Name: IDDocument.absolutePath
           },
         },
         TargetImage: {
           S3Object: {
             Bucket: process.env.AWS_S3_BUCKET,
-            Name: "/"+verificationDocument.absolutePath
+            Name: verificationDocument.absolutePath
           },
         },
         SimilarityThreshold: 0
       }
+      console.log("Rekog 3")
       client.compareFaces(params, function(err, response) {
-        console.log({err})
-        console.log({response})
         if (err) {
           reject(err);
         } else {
           resolve(response);
-          // response.FaceMatches.forEach(data => {
-          //   console.log("Result Recognition")
-          //   let position   = data.Face.BoundingBox
-          //   let similarity = data.Similarity
-          //   console.log(`The face at: ${position.Left}, ${position.Top} matches with ${similarity} % confidence`)
-          // }) // for response.faceDetails
-        } // if
+        }
       });
     });
   }
