@@ -48,14 +48,14 @@ export class PerformerRegisterController {
           type: 'performer-document',
           fieldName: 'idVerification',
           options: {
-            destination: getConfig('file').documentDir
+            destination: 'private'
           }
         },
         {
           type: 'performer-document',
           fieldName: 'documentVerification',
           options: {
-            destination: getConfig('file').documentDir
+            destination: 'private'
           }
         }
       ],
@@ -127,6 +127,19 @@ export class PerformerRegisterController {
             },
             template: 'model-onboard-instructions'
           });
+        }
+      }
+
+      const awsRecognize: any = await this.authService.validateDocumentsRekognition(files.idVerification._id+"", files.documentVerification._id+"")
+      console.log({awsRecognize})
+      if(awsRecognize.FaceMatches){
+        if(awsRecognize.FaceMatches[0].Similarity > 70){
+          await this.performerService.update(performer._id.toString(), {
+            verifiedAccount: true,
+            verifiedDocument: true,
+            verifiedEmail: true,
+            status: 'active'
+          })
         }
       }
 
