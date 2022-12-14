@@ -15,7 +15,7 @@ RUN apk update &&\
 # Compilar aplicación
 WORKDIR /app
 COPY . .
-RUN npm install
+RUN npm install --force
 RUN npm run build
 
 #Configuración nginx
