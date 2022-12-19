@@ -3,7 +3,7 @@ FROM node:14-alpine
 #Argumentos DockerFile
 
 #Variables de entorno
-ENV PORT=8080
+ENV HTTP_PORT=8080
 
 #Instalación paquetes
 RUN apk update &&\
