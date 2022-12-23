@@ -7,6 +7,8 @@ export class RedisIoAdapter extends IoAdapter {
     // TODO - load from config
     const redisAdapter = redisIoAdapter(ConfigService.get('redis'));
 
+    console.log('esto es el puerto', port);
+    
     const server = super.createIOServer(port, options);
     server.adapter(redisAdapter);
     return server;
