@@ -10,7 +10,8 @@ RUN apk update &&\
     apk add --no-cache \
     supervisor \
     nginx \
-    redis
+    redis \
+    ffmpeg
 
 # Compilar aplicación
 WORKDIR /app
