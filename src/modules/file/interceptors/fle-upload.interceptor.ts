@@ -54,6 +54,9 @@ export function FileUploadInterceptor(
       })
       
       const upload = multer({
+        limits: {
+          fileSize: 20971520, // 10 Mb
+        },
         storage: multerS3({
           s3: s3,
           bucket: process.env.AWS_S3_BUCKET,
