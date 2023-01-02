@@ -77,6 +77,14 @@ export class PerformerRegisterController {
       );
       const data = omit(payload, REGISTER_EXCLUSIVE_FIELDS) as any;
 
+      let awsRecognize;
+      try{
+        awsRecognize = await this.authService.validateDocumentsRekognition(files.idVerification._id+"", files.documentVerification._id+"")
+      }
+      catch(err){
+        throw new HttpException('Invalid Images', 400);
+      }
+
       const performer = await this.performerService.register({
         ...data,
         avatarId: null,
@@ -130,8 +138,6 @@ export class PerformerRegisterController {
         }
       }
 
-      const awsRecognize: any = await this.authService.validateDocumentsRekognition(files.idVerification._id+"", files.documentVerification._id+"")
-      console.log({awsRecognize})
       if(awsRecognize.FaceMatches){
         if(awsRecognize.FaceMatches[0].Similarity > 70){
           await this.performerService.update(performer._id.toString(), {
