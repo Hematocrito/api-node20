@@ -67,21 +67,6 @@ export class FeedService {
     this.defindJobs();
   }
 
-  public async getAllFeeds():Promise<FeedModel[]> {
-    return await this.feedModel.find().sort({updatedAt:-1});
-  }
-  public async getMedia(type:string):Promise<FeedModel[]> {
-    return await this.feedModel.find({type}).sort({updatedAt:-1});
-  }
-  public async getClips(content:string):Promise<FeedModel[]> {
-    if (content == "free") {
-      return await this.feedModel.find({type:"video",price:0}).sort({updatedAt:-1});
-    }
-
-    return await this.feedModel.find({type:"video"}).sort({updatedAt:-1});
-  }
-
-
   private async defindJobs() {
     const collection = (this.agenda as any)._collection;
     await collection.deleteMany({
@@ -241,47 +226,7 @@ export class FeedService {
     return new FeedDto(newFeed[0]);
   }
 
-  public async createFeedPhoto(idPerformer: ObjectId, idFile: ObjectId, texto: string): Promise<any> {
-    // TODO - validate with the feed type?
-   /* await this._validatePayload(payload);
-    const fromSourceId = user.roles && user.roles.includes('admin') && payload.fromSourceId ? payload.fromSourceId : user._id;*/
-    const performer = await this.performerService.findById(idPerformer);
-    if (!performer) throw new EntityNotFoundException();
-    const feed = await this.feedModel.create({
-      fileIds: [idFile],
-      type: 'feed-photo',
-      text: texto,
-      orientation: performer.gender,
-      fromSource: 'performer',
-      idPerformer
-    } as any);
-/*    if (feed.fileIds && feed.fileIds.length) {
-      await Promise.all(feed.fileIds.map(async (fileId) => {
-        await this.fileService.addRef((fileId as any), {
-          itemId: feed._id,
-          itemType: REF_TYPE.FEED
-        });
-      }));
-    }
-    feed.teaserId && await this.fileService.addRef((feed.teaserId as any), {
-      itemId: feed._id,
-      itemType: REF_TYPE.FEED
-    });
-    feed.thumbnailId && await this.fileService.addRef((feed.thumbnailId as any), {
-      itemId: feed._id,
-      itemType: REF_TYPE.FEED
-    });
-    await this.queueEventService.publish(
-      new QueueEvent({
-        channel: PERFORMER_FEED_CHANNEL,
-        eventName: EVENT.CREATED,
-        data: new FeedDto(feed)
-      })
-    );*/
-    return feed;
-  }
-
-  public async create(file: FileDto, payload: FeedCreatePayload, user: UserDto): Promise<any> {
+  public async create(payload: FeedCreatePayload, user: UserDto): Promise<any> {
     // TODO - validate with the feed type?
     await this._validatePayload(payload);
     const fromSourceId = user.roles && user.roles.includes('admin') && payload.fromSourceId ? payload.fromSourceId : user._id;
@@ -290,13 +235,11 @@ export class FeedService {
     const feed = await this.feedModel.create({
       ...payload,
       orientation: performer.gender,
-      fileIds: file._id,
       fromSource: 'performer',
       fromSourceId
     } as any);
     if (feed.fileIds && feed.fileIds.length) {
       await Promise.all(feed.fileIds.map(async (fileId) => {
-        console.log("ID",fileId)
         await this.fileService.addRef((fileId as any), {
           itemId: feed._id,
           itemType: REF_TYPE.FEED

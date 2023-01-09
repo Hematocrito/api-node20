@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "nest build && yarn copy-template",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "dev": "yarn start:dev",
     "start": "nest start",

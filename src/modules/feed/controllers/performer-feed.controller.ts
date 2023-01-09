@@ -1,38 +1,15 @@
 import {
-  Controller,
-  Injectable,
-  UseGuards,
-  Body,
-  Post,
-  HttpCode,
-  HttpStatus,
-  UsePipes,
-  ValidationPipe,
-  Put,
-  Param,
-  Delete,
-  Get,
-  Query,
-  Request,
-  forwardRef,
-  Inject,
-  UseInterceptors
+  Controller, Injectable, UseGuards, Body, Post, HttpCode, HttpStatus, UsePipes, ValidationPipe, Put, Param, Delete, Get, Query, Request, forwardRef, Inject
 } from '@nestjs/common';
 import { RoleGuard } from 'src/modules/auth/guards';
-import { DataResponse, getConfig, PageableData } from 'src/kernel';
+import { DataResponse, PageableData } from 'src/kernel';
 import { CurrentUser, Roles } from 'src/modules/auth';
 import { UserDto } from 'src/modules/user/dtos';
 import { AuthService } from 'src/modules/auth/services';
-import {
-  FeedCreatePayload, FeedSearchRequest,
-  PollCreatePayload
-} from '../payloads';
+import { FeedCreatePayload, FeedSearchRequest, PollCreatePayload } from '../payloads';
 import { FeedDto } from '../dtos';
 import { FeedService } from '../services';
 import { MissingFieldsException } from '../exceptions';
-import { FeedModel } from '../models';
-import { FileService } from 'src/modules/file/services';
-import { FilesUploaded, MultiFileUploadInterceptor } from 'src/modules/file';
 
 @Injectable()
 @Controller('feeds/performers')
@@ -43,65 +20,19 @@ export class PerformerFeedController {
     private readonly authService: AuthService
   ) {}
 
-  @Post('/photo')
-  @Roles('performer'/*, 'admin'*/)
+  @Post('/')
+  @Roles('performer', 'admin')
   @UseGuards(RoleGuard)
   @HttpCode(HttpStatus.OK)
-  //@UsePipes(new ValidationPipe({ transform: true }))
-  @UseInterceptors(
-    // TODO - check and support multiple files!!!
-    MultiFileUploadInterceptor([
-      {
-        type: 'feed-photo',
-        fieldName: 'photo',
-        options: {
-          destination: getConfig('file').photoProtectedDir
-          //replaceWithoutExif: true
-        }
-      }
-    ])
-  )
-  async createFeedPhoto(
-    @FilesUploaded() files: Record<string, any>,
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async create(
     @Body() payload: FeedCreatePayload,
     @CurrentUser() user: UserDto
-  ): Promise<DataResponse<any>> {/*
+  ): Promise<DataResponse<any>> {
     if (user.roles && user.roles.includes('admin') && !payload.fromSourceId) {
       throw new MissingFieldsException();
-    }*/
-    
-    const data = await this.feedService.create(files.photo, payload, user);
-    return DataResponse.ok(data);
-  }
-
-  @Post('/video')
-  @Roles('performer'/*, 'admin'*/)
-  @UseGuards(RoleGuard)
-  @HttpCode(HttpStatus.OK)
-  //@UsePipes(new ValidationPipe({ transform: true }))
-  @UseInterceptors(
-    // TODO - check and support multiple files!!!
-    MultiFileUploadInterceptor([
-      {
-        type: 'feed-video',
-        fieldName: 'video',
-        options: {
-          destination: getConfig('file').photoProtectedDir
-          //replaceWithoutExif: true
-        }
-      }
-    ])
-  )
-  async createFeedVideo(
-    @FilesUploaded() files: Record<string, any>,
-    @Body() payload: FeedCreatePayload,
-    @CurrentUser() user: UserDto
-  ): Promise<DataResponse<any>> {/*
-    if (user.roles && user.roles.includes('admin') && !payload.fromSourceId) {
-      throw new MissingFieldsException();
-    }*/
-    
-    const data = await this.feedService.create(files.video, payload, user);
+    }
+    const data = await this.feedService.create(payload, user);
     return DataResponse.ok(data);
   }
 

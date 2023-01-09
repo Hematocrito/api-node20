@@ -1,34 +1,18 @@
 import {
-  Controller,
-  Injectable,
-  UseGuards,
-  Post,
-  HttpCode,
-  HttpStatus,
-  UseInterceptors,
-  UploadedFile,
-  Param,
-  Query,
-  Get,
-  Body
+  Controller, Injectable, UseGuards, Post, HttpCode, HttpStatus, UseInterceptors
 } from '@nestjs/common';
 import { RoleGuard } from 'src/modules/auth/guards';
 import { DataResponse, getConfig } from 'src/kernel';
 import { CurrentUser, Roles } from 'src/modules/auth';
 import { UserDto } from 'src/modules/user/dtos';
-import { FileDto, FileUploaded, FileUploadInterceptor, MultiFileUploadInterceptor } from 'src/modules/file';
-import { FeedCreatePayload } from '../payloads';
-import { FeedFileService, FeedService } from '../services';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { FileService } from 'src/modules/file/services';
+import { FileDto, FileUploaded, FileUploadInterceptor } from 'src/modules/file';
+import { FeedFileService } from '../services';
 
 @Injectable()
 @Controller('feeds/performers')
 export class FeedFileController {
   constructor(
-    private readonly feedFileService: FeedFileService,
-    private readonly fileService: FileService,
-    private readonly feedService: FeedService
+    private readonly feedFileService: FeedFileService
   ) {}
 
   @Post('photo/upload')
@@ -37,9 +21,8 @@ export class FeedFileController {
   @UseGuards(RoleGuard)
   @UseInterceptors(
     FileUploadInterceptor('feed-photo', 'file', {
-      destination: 'public/feeds',
-      //replaceWithoutExif: true
-    })
+      destination: getConfig('file').feedProtectedDir
+      })
   )
   async uploadImage(
     @FileUploaded() file: FileDto
@@ -55,13 +38,13 @@ export class FeedFileController {
 
   @Post('video/upload')
   @HttpCode(HttpStatus.OK)
-  @Roles('performer')
+  @Roles('performer', 'admin')
   @UseGuards(RoleGuard)
   @UseInterceptors(
     FileUploadInterceptor('feed-video', 'file', {
-      destination: 'public/feeds',
-      //replaceWithoutExif: true
-    })
+      destination: getConfig('file').feedProtectedDir,
+      convertMp4: true
+      })
   )
   async uploadVideo(
     @CurrentUser() user: UserDto,
@@ -82,9 +65,8 @@ export class FeedFileController {
   @UseGuards(RoleGuard)
   @UseInterceptors(
     FileUploadInterceptor('feed-photo', 'file', {
-      destination: 'public/feeds',
-      //replaceWithoutExif: true
-    })
+      destination: getConfig('file').feedDir
+      })
   )
   async uploadThumb(
     @FileUploaded() file: FileDto
@@ -104,9 +86,9 @@ export class FeedFileController {
   @UseGuards(RoleGuard)
   @UseInterceptors(
     FileUploadInterceptor('feed-video', 'file', {
-      destination: 'public/feeds',
-      //replaceWithoutExif: true
-    })
+      destination: getConfig('file').feedDir,
+      convertMp4: true
+      })
   )
   async uploadTeaser(
     @FileUploaded() file: FileDto
