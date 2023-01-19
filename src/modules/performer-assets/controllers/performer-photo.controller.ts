@@ -41,18 +41,18 @@ export class PerformerPhotoController {
     // TODO - check and support multiple files!!!
     MultiFileUploadInterceptor([
       {
-        type: 'performer-photo',
-        fieldName: 'photo',
-        options: {
-          destination: getConfig('file').photoProtectedDir,
-          thumbnailSize: {
-            width: 10,
-            height: 10
-          },
-          generateThumbnail: true
-        }
+      type: 'performer-photo',
+      fieldName: 'photo',
+      options: {
+      destination: getConfig('file').photoProtectedDir,
+      thumbnailSize: {
+      width: 10,
+      height: 10
+      },
+      generateThumbnail: true
       }
-    ])
+      }
+      ])
   )
   async upload(
     @FilesUploaded() files: Record<string, any>,

@@ -15,8 +15,9 @@ import { StringHelper } from 'src/kernel';
 import { FileService } from '../services';
 import { transformException } from '../lib/multer/multer.utils';
 import { IFileUploadOptions } from '../lib';
-var aws = require('aws-sdk');
-var multerS3 = require('multer-s3');
+
+const aws = require('aws-sdk');
+const multerS3 = require('multer-s3');
 
 export function FileUploadInterceptor(
   type = 'file',
@@ -47,28 +48,28 @@ export function FileUploadInterceptor(
       // todo - support other storage type?
       const { uploadDir } = this;
 
-      var s3 = new aws.S3({
+      const s3 = new aws.S3({
         accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_S3_SECRET,
         Bucket: process.env.AWS_S3_BUCKET
-      })
-      
+      });
+
       const upload = multer({
         limits: {
-          fileSize: 20971520, // 10 Mb
+          fileSize: 20971520 // 10 Mb
         },
         storage: multerS3({
-          s3: s3,
+          s3,
           bucket: process.env.AWS_S3_BUCKET,
           contentType: multerS3.AUTO_CONTENT_TYPE,
-          metadata: function (req, file, cb) {
-            cb(null, { fieldName, });
+          metadata(req: any, file: any, cb: any) {
+            cb(null, { fieldName });
           },
           key(req, file, cb) {
             if (options.fileName) {
               return cb(null, options.fileName);
             }
-  
+
             const ext = (
               StringHelper.getExt(file.originalname) || ''
             ).toLocaleLowerCase();
@@ -78,14 +79,13 @@ export function FileUploadInterceptor(
               `${randomText}-${orgName}`
             ).toLocaleLowerCase() + ext;
 
-            if(uploadDir)
-              name = uploadDir+"/"+name;
+            if (uploadDir) name = `${uploadDir}/${name}`;
 
             return cb(null, name);
           }
         })
       }).single(fieldName);
-      
+
       await new Promise((resolve, reject) => upload(ctx.getRequest(), ctx.getResponse(), (err: any) => {
         if (err) {
           const error = transformException(err);
