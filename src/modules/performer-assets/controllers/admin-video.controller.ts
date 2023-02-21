@@ -39,29 +39,29 @@ export class AdminPerformerVideosController {
     // TODO - check and support multiple files!!!
     MultiFileUploadInterceptor(
       [
-        {
-          type: 'performer-video',
-          fieldName: 'video',
-          options: {
-            destination: getConfig('file').videoProtectedDir
-          }
-        },
-        {
-          type: 'performer-video-teaser',
-          fieldName: 'teaser',
-          options: {
-            destination: getConfig('file').videoDir
-          }
-        },
-        {
-          type: 'performer-video-thumbnail',
-          fieldName: 'thumbnail',
-          options: {
-            destination: getConfig('file').imageDir,
-            generateThumbnail: true,
-            thumbnailSize: getConfig('image').videoThumbnail
-          }
-        }
+      {
+      type: 'performer-video',
+      fieldName: 'video',
+      options: {
+      destination: getConfig('file').videoProtectedDir
+      }
+      },
+      {
+      type: 'performer-video-teaser',
+      fieldName: 'teaser',
+      options: {
+      destination: getConfig('file').videoDir
+      }
+      },
+      {
+      type: 'performer-video-thumbnail',
+      fieldName: 'thumbnail',
+      options: {
+      destination: getConfig('file').imageDir,
+      generateThumbnail: true,
+      thumbnailSize: getConfig('image').videoThumbnail
+      }
+      }
       ],
       {}
     )
@@ -109,29 +109,29 @@ export class AdminPerformerVideosController {
     // TODO - check and support multiple files!!!
     MultiFileUploadInterceptor(
       [
-        {
-          type: 'performer-video',
-          fieldName: 'video',
-          options: {
-            destination: getConfig('file').videoProtectedDir
-          }
-        },
-        {
-          type: 'performer-video-teaser',
-          fieldName: 'teaser',
-          options: {
-            destination: getConfig('file').videoDir
-          }
-        },
-        {
-          type: 'performer-video-thumbnail',
-          fieldName: 'thumbnail',
-          options: {
-            destination: getConfig('file').imageDir,
-            generateThumbnail: true,
-            thumbnailSize: getConfig('image').videoThumbnail
-          }
-        }
+      {
+      type: 'performer-video',
+      fieldName: 'video',
+      options: {
+      destination: getConfig('file').videoProtectedDir
+      }
+      },
+      {
+      type: 'performer-video-teaser',
+      fieldName: 'teaser',
+      options: {
+      destination: getConfig('file').videoDir
+      }
+      },
+      {
+      type: 'performer-video-thumbnail',
+      fieldName: 'thumbnail',
+      options: {
+      destination: getConfig('file').imageDir,
+      generateThumbnail: true,
+      thumbnailSize: getConfig('image').videoThumbnail
+      }
+      }
       ],
       {}
     )

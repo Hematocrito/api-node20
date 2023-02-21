@@ -39,13 +39,13 @@ export class AdminPerformerPhotoController {
     // TODO - check and support multiple files!!!
     MultiFileUploadInterceptor([
       {
-        type: 'performer-photo',
-        fieldName: 'photo',
-        options: {
-          destination: getConfig('file').photoProtectedDir
-        }
+      type: 'performer-photo',
+      fieldName: 'photo',
+      options: {
+      destination: getConfig('file').photoProtectedDir
       }
-    ])
+      }
+      ])
   )
   async upload(
     @FilesUploaded() files: Record<string, any>,

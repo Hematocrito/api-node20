@@ -50,6 +50,10 @@ export class FeedCreatePayload {
   isSale: boolean;
 
   @ApiProperty()
+  @IsOptional()
+  isSchedule: boolean;
+
+  @ApiProperty()
   @IsNumber()
   @IsOptional()
   price: number;
