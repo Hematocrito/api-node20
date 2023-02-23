@@ -24,7 +24,7 @@ export class FeedModel extends Document {
 
   isSale: boolean;
 
-  isSchedule: boolean;
+  isBySubscription: boolean;
 
   price: number;
 
