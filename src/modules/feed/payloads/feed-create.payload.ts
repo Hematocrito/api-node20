@@ -55,6 +55,11 @@ export class FeedCreatePayload {
   isBySubscription: boolean;
 
   @ApiProperty()
+  @IsBoolean()
+  @IsOptional()
+  inSubscribe: boolean;
+
+  @ApiProperty()
   @IsNumber()
   @IsOptional()
   price: number;

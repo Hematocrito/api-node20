@@ -45,6 +45,8 @@ export class FeedDto {
 
   price: number;
 
+  inSubscribe: boolean;
+
   isBookMarked: boolean;
 
   orientation: string;
@@ -90,6 +92,7 @@ export class FeedDto {
         'polls',
         'isSale',
         'price',
+        'inSubscribe',
         'isSubscribed',
         'isBought',
         'pollExpiredAt',

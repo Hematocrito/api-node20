@@ -71,7 +71,7 @@ export class PerformerVideosController {
     @FilesUploaded() files: Record<string, any>,
     @Body() payload: VideoCreatePayload,
     @CurrentUser() uploader: UserDto
-  ): Promise<any> {
+  ): Promise<any> { 
     const resp = await this.videoService.create(
       files.video,
       files.teaser,

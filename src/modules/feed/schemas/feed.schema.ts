@@ -52,6 +52,7 @@ export const FeedSchema = new Schema({
   totalComment: { type: Number, default: 0 },
   isSale: { type: Boolean, default: false },
   isBySubscription: { type: Boolean, default: false },
+  inSubscribe: { type: Boolean, default: false },
   price: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

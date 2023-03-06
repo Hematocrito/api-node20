@@ -273,6 +273,7 @@ export class VideoService {
         itemId: model._id
       })
     ]);
+	console.log('VIDEO_STATUS.ACTIVE ', model.status);
     if (model.status === VIDEO_STATUS.ACTIVE) {
       await this.queueEventService.publish(
         new QueueEvent({
@@ -282,6 +283,7 @@ export class VideoService {
         })
       );
     }
+	console.log('VIDEO_STATUS.ACTIVE ', model.status);
     // covert video file
     await this.fileService.queueProcessVideo(model.fileId, {
       publishChannel: PERFORMER_VIDEO_CHANNEL,

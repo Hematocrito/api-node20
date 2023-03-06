@@ -26,6 +26,8 @@ export class FeedModel extends Document {
 
   isBySubscription: boolean;
 
+  inSubscribe: boolean;
+
   price: number;
 
   orientation: string;
