@@ -129,7 +129,7 @@ export class AdminPerformerController {
   @UseInterceptors(
     FileUploadInterceptor('performer-document', 'file', {
       destination: 'public/documents'
-    })
+      })
   )
   async uploadPerformerDocument(
     @FileUploaded() file: FileDto,
@@ -156,7 +156,7 @@ export class AdminPerformerController {
       // generateThumbnail: true,
       // replaceByThumbnail: true,
       // thumbnailSize: getConfig('image').avatar
-    })
+      })
   )
   async uploadPerformerAvatar(@FileUploaded() file: FileDto): Promise<any> {
     // TODO - define url for perfomer id if have?
@@ -173,7 +173,7 @@ export class AdminPerformerController {
   @UseInterceptors(
     FileUploadInterceptor('cover', 'cover', {
       destination: getConfig('file').coverDir
-    })
+      })
   )
   async uploadPerformerCover(@FileUploaded() file: FileDto): Promise<any> {
     // TODO - define url for perfomer id if have?

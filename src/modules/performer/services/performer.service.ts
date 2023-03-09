@@ -89,7 +89,7 @@ export class PerformerService {
   }
 
   public async update(id: string, data: any): Promise<void> {
-    await this.performerModel.updateOne({_id: id} , data);
+    await this.performerModel.updateOne({ _id: id }, data);
   }
 
   public async getBankingSettings(performerId: ObjectId) {

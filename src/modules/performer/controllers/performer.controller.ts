@@ -4,6 +4,7 @@ import {
   UseGuards,
   Body,
   Post,
+  Delete,
   HttpCode,
   HttpStatus,
   UsePipes,
@@ -139,6 +140,14 @@ export class PerformerController {
     return DataResponse.ok(new PerformerDto(performer).toResponse(true, false));
   }
 
+  @Delete('/:id')
+  @UseGuards(RoleGuard)
+  @HttpCode(HttpStatus.OK)
+  async remove(@Param('id') id: string) {
+    const result = await this.performerService.delete(id);
+    return result.deleted;
+  }
+
   @Get('/:username')
   @UseGuards(LoadUser)
   @HttpCode(HttpStatus.OK)
@@ -189,7 +198,7 @@ export class PerformerController {
   @UseInterceptors(
     FileUploadInterceptor('performer-document', 'file', {
       destination: getConfig('file').documentDir
-    })
+      })
   )
   async uploadPerformerDocument(
     @CurrentUser() currentUser: UserDto,
@@ -227,7 +236,7 @@ export class PerformerController {
       generateThumbnail: true,
       replaceByThumbnail: true,
       thumbnailSize: getConfig('image').avatar
-    })
+      })
   )
   async uploadPerformerAvatar(
     @FileUploaded() file: FileDto,
@@ -250,7 +259,7 @@ export class PerformerController {
       destination: getConfig('file').coverDir,
       generateThumbnail: true,
       thumbnailSize: getConfig('image').coverThumbnail
-    })
+      })
   )
   async uploadPerformerCover(
     @FileUploaded() file: FileDto,
@@ -271,7 +280,7 @@ export class PerformerController {
   @UseInterceptors(
     FileUploadInterceptor('performer-welcome-video', 'welcome-video', {
       destination: getConfig('file').videoDir
-    })
+      })
   )
   async uploadPerformerVideo(
     @FileUploaded() file: FileDto,
