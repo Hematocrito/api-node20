@@ -258,9 +258,56 @@ export class VideoService {
     creator && model.set('createdBy', creator._id);
     model.createdAt = new Date();
     model.updatedAt = new Date();
+    console.log('STATUS ', model.status);
+    const guarda = await model.save();
+    console.log('SAVE ', guarda);
+    await Promise.all([
+      model.thumbnailId && this.fileService.addRef(model.thumbnailId, {
+        itemId: model._id,
+        itemType: REF_TYPE.VIDEO
+      }),
+      model.teaserId && this.fileService.addRef(model.teaserId, {
+        itemId: model._id,
+        itemType: REF_TYPE.VIDEO
+      }),
+      model.fileId && this.fileService.addRef(model.fileId, {
+        itemType: REF_TYPE.VIDEO,
+        itemId: model._id
+      })
+    ]);
+    if (model.status === VIDEO_STATUS.ACTIVE) {
+      const publish = await this.queueEventService.publish(
+        new QueueEvent({
+          channel: PERFORMER_COUNT_VIDEO_CHANNEL,
+          eventName: EVENT.CREATED,
+          data: new VideoDto(model)
+        })
+      );
+      console.log('AFTER PUBLISH', publish);
+    }
+    // covert video file
+    await this.fileService.queueProcessVideo(model.fileId, {
+      publishChannel: PERFORMER_VIDEO_CHANNEL,
+      meta: {
+        videoId: model._id
+      }
+    });
+    // convert teaser file
+    model.teaserId && await this.fileService.queueProcessVideo(model.teaserId, {
+      publishChannel: PERFORMER_VIDEO_TEASER_CHANNEL,
+      meta: {
+        videoId: model._id
+      }
+    });
 
-    await model.save();
     const dto = new VideoDto(model);
+    await this.queueEventService.publish(
+      new QueueEvent({
+        channel: PERFORMER_VIDEO_CHANNEL,
+        eventName: EVENT.CREATED,
+        data: dto
+      })
+    );
     return dto;
   }
 
