@@ -377,10 +377,10 @@ export class GalleryService {
   public async userSearch(
     req: GallerySearchRequest,
     user: UserDto
-  ) {
+  ): Promise<PageableData<GalleryDto>> {
     const query = {
       status: STATUS.ACTIVE,
-      numOfItems: { $gte: 0 }
+      numOfItems: { $gt: 0 }
     } as any;
     if (req.q) {
       const regexp = new RegExp(
@@ -396,7 +396,7 @@ export class GalleryService {
         }
       ];
     }
-    if (req.performerId) query.performerId = new ObjectId(req.performerId);
+    if (req.performerId) query.performerId = req.performerId;
     if (req.excludedId) {
       query._id = { $ne: req.excludedId };
     }
@@ -408,13 +408,6 @@ export class GalleryService {
         [req.sortBy]: req.sort
       };
     }
-    const respuesta = await this.galleryModel
-      .find(query)
-      .lean()
-      .sort(sort)
-      .limit(req.limit ? parseInt(req.limit as string, 10) : 10)
-      .skip(parseInt(req.offset as string, 10));
-
     const [data, total] = await Promise.all([
       this.galleryModel
         .find(query)

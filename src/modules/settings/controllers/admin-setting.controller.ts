@@ -8,14 +8,16 @@ import {
   UseGuards,
   Body,
   Put,
-  Param
+  Param,
+  Post
 } from '@nestjs/common';
 import { DataResponse } from 'src/kernel';
 import { SettingService } from '../services';
 import { SettingDto } from '../dtos';
 import { RoleGuard } from '../../auth/guards';
 import { Roles } from '../../auth';
-import { SettingUpdatePayload } from '../payloads';
+import { SettingCreatePayload, SettingUpdatePayload } from '../payloads';
+import { SettingModel } from '../models';
 
 @Injectable()
 @Controller('admin/settings')
@@ -31,6 +33,17 @@ export class AdminSettingController {
   ): Promise<DataResponse<SettingDto[]>> {
     const settings = await this.settingService.getEditableSettings(group);
     return DataResponse.ok(settings);
+  }
+
+  @Post('create')
+  @HttpCode(HttpStatus.OK)
+  @Roles('admin')
+  @UseGuards(RoleGuard)
+  async createSetting(
+    @Body() value: SettingCreatePayload
+  ) {
+    const data = await this.settingService.create(value);
+    return DataResponse.ok(data);
   }
 
   @Put('/:key')
