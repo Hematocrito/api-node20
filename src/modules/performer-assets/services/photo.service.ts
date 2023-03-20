@@ -19,8 +19,11 @@ import { PHOTO_STATUS } from '../constants';
 import { PhotoDto, GalleryDto } from '../dtos';
 import { PhotoCreatePayload, PhotoUpdatePayload } from '../payloads';
 import { GalleryService } from './gallery.service';
-import { PhotoModel } from '../models';
-import { PERFORMER_PHOTO_MODEL_PROVIDER } from '../providers';
+import { GalleryModel, PhotoModel } from '../models';
+import {
+  PERFORMER_GALLERY_MODEL_PROVIDER,
+  PERFORMER_PHOTO_MODEL_PROVIDER
+} from '../providers';
 
 export const PERFORMER_COUNT_PHOTO_CHANNEL = 'PERFORMER_COUNT_PHOTO_CHANNEL';
 const PHOTO_CONVERT_CHANNEL = 'PHOTO_CONVERT_CHANNEL';
@@ -39,6 +42,8 @@ export class PhotoService {
     private readonly checkPaymentService: CheckPaymentService,
     @Inject(PERFORMER_PHOTO_MODEL_PROVIDER)
     private readonly photoModel: Model<PhotoModel>,
+    @Inject(PERFORMER_GALLERY_MODEL_PROVIDER)
+    private readonly galleryModel: Model<GalleryModel>,
     private readonly queueEventService: QueueEventService,
     private readonly fileService: FileService
 
@@ -114,6 +119,14 @@ export class PhotoService {
     }
     photo.processing = true;
     await photo.save();
+    const galleries = await this.photoModel.find({ galleryId: photo.galleryId });
+    console.log('FOTOS ', galleries.length);
+    if (galleries.length > 0) {
+      const gallery = await this.galleryModel.findById(photo.galleryId);
+      gallery.numOfItems = galleries.length;
+      gallery.save();
+    }
+
     await Promise.all([
       this.fileService.addRef(file._id, {
         itemType: REF_TYPE.PHOTO,
