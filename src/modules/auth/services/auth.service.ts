@@ -13,11 +13,13 @@ import { SettingService } from 'src/modules/settings';
 import { StringHelper, EntityNotFoundException, getConfig } from 'src/kernel';
 import { MailerService } from 'src/modules/mailer';
 import { SETTING_KEYS } from 'src/modules/settings/constants';
-import * as AWS from 'aws-sdk';
 import { FileService } from 'src/modules/file/services';
+import * as path from 'path';
 import { AUTH_MODEL_PROVIDER, FORGOT_MODEL_PROVIDER, VERIFICATION_MODEL_PROVIDER } from '../providers/auth.provider';
 import { AuthModel, ForgotModel, VerificationModel } from '../models';
 import { AuthCreateDto, AuthUpdateDto } from '../dtos';
+
+const AWS = require('aws-sdk');
 
 @Injectable()
 export class AuthService {
@@ -300,35 +302,55 @@ export class AuthService {
       const IDDocument = await this.fileService.findById(idVerification);
       const verificationDocument = await this.fileService.findById(idDocumentVerification);
       // eslint-disable-next-line no-new
-      new AWS.Config({
+      const bucket = process.env.AWS_S3_BUCKET; // the bucketname without s3://
+      const photoSource = IDDocument.absolutePath; // the name of file
+      const photoTarget = verificationDocument.absolutePath;
+      /* new AWS.Config({
         accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_S3_SECRET,
         region: process.env.AWS_REGION
-      });
+      }); */
+      const credentials = new AWS.SharedIniFileCredentials({ filename: path.join(process.cwd(), 'credentials'), profile: 'project1' });
+      // const credentials = new AWS.SharedIniFileCredentials({ profile: 'project1' });
+      AWS.config.credentials = credentials;
+      AWS.config.update({ region: process.env.AWS_REGION });
+
       const client = new AWS.Rekognition();
       const params = {
         SourceImage: {
           S3Object: {
-            Bucket: process.env.AWS_S3_BUCKET,
-            Name: IDDocument.absolutePath
+            Bucket: bucket,
+            Name: photoSource
           }
         },
         TargetImage: {
           S3Object: {
-            Bucket: process.env.AWS_S3_BUCKET,
-            Name: verificationDocument.absolutePath
+            Bucket: bucket,
+            Name: photoTarget
           }
         },
         SimilarityThreshold: 0
       };
-      console.log('Rekog 3');
       client.compareFaces(params, (err, response) => {
+        if (err) {
+          console.log(err, err.stack); // an error occurred
+        } else {
+          response.FaceMatches.forEach((data) => {
+            const position = data.Face.BoundingBox;
+            const similarity = data.Similarity;
+            console.log(`The face at: ${position.Left}, ${position.Top} matches with ${similarity} % confidence`);
+            resolve(response);
+          }); // for response.faceDetails
+        } // if
+      });
+      /* client.compareFaces(params, (err, response) => {
+        console.log('ERR ', err);
         if (err) {
           reject(err);
         } else {
           resolve(response);
         }
-      });
+      }); */
     });
   }
 }
