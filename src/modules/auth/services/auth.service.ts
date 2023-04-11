@@ -13,11 +13,12 @@ import { SettingService } from 'src/modules/settings';
 import { StringHelper, EntityNotFoundException, getConfig } from 'src/kernel';
 import { MailerService } from 'src/modules/mailer';
 import { SETTING_KEYS } from 'src/modules/settings/constants';
+import * as AWS from 'aws-sdk';
+import { FileService } from 'src/modules/file/services';
 import { AUTH_MODEL_PROVIDER, FORGOT_MODEL_PROVIDER, VERIFICATION_MODEL_PROVIDER } from '../providers/auth.provider';
 import { AuthModel, ForgotModel, VerificationModel } from '../models';
 import { AuthCreateDto, AuthUpdateDto } from '../dtos';
-import * as AWS from 'aws-sdk';
-import { FileService } from 'src/modules/file/services';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -32,7 +33,7 @@ export class AuthService {
     @Inject(FORGOT_MODEL_PROVIDER)
     private readonly forgotModel: Model<ForgotModel>,
     private readonly mailService: MailerService,
-    private readonly fileService: FileService,
+    private readonly fileService: FileService
   ) { }
 
   /**
@@ -293,10 +294,12 @@ export class AuthService {
     }
   }
 
-  validateDocumentsRekognition(idVerification: string, idDocumentVerification: string){
+  validateDocumentsRekognition(idVerification: string, idDocumentVerification: string) {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
-      let IDDocument = await this.fileService.findById(idVerification);
-      let verificationDocument = await this.fileService.findById(idDocumentVerification);
+      const IDDocument = await this.fileService.findById(idVerification);
+      const verificationDocument = await this.fileService.findById(idDocumentVerification);
+      // eslint-disable-next-line no-new
       new AWS.Config({
         accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_S3_SECRET,
@@ -308,18 +311,18 @@ export class AuthService {
           S3Object: {
             Bucket: process.env.AWS_S3_BUCKET,
             Name: IDDocument.absolutePath
-          },
+          }
         },
         TargetImage: {
           S3Object: {
             Bucket: process.env.AWS_S3_BUCKET,
             Name: verificationDocument.absolutePath
-          },
+          }
         },
         SimilarityThreshold: 0
-      }
-      console.log("Rekog 3")
-      client.compareFaces(params, function(err, response) {
+      };
+      console.log('Rekog 3');
+      client.compareFaces(params, (err, response) => {
         if (err) {
           reject(err);
         } else {

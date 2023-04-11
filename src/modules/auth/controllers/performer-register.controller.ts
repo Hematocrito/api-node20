@@ -76,14 +76,13 @@ export class PerformerRegisterController {
         SETTING_KEYS.REQUIRE_EMAIL_VERIFICATION_PERFORMER
       );
       const data = omit(payload, REGISTER_EXCLUSIVE_FIELDS) as any;
-      /*
+
       let awsRecognize;
       try {
-        awsRecognize = await this.authService.validateDocumentsRekognition(files.idVerification._id+"", files.documentVerification._id+"")
-      }
-      catch(err){
+        awsRecognize = await this.authService.validateDocumentsRekognition(`${files.idVerification._id}`, `${files.documentVerification._id}`);
+      } catch (err) {
         throw new HttpException('Invalid Images', 400);
-      } */
+      }
 
       const performer = await this.performerService.register({
         ...data,
@@ -137,17 +136,17 @@ export class PerformerRegisterController {
           });
         }
       }
-      /*
-      if (awsRecognize.FaceMatches){
-        if(awsRecognize.FaceMatches[0].Similarity > 70){
+
+      if (awsRecognize.FaceMatches) {
+        if (awsRecognize.FaceMatches[0].Similarity > 70) {
           await this.performerService.update(performer._id.toString(), {
             verifiedAccount: true,
             verifiedDocument: true,
             verifiedEmail: true,
             status: 'active'
-          })
+          });
         }
-      } */
+      }
 
       return DataResponse.ok({
         message: requireEmailVerification ? 'Please verify your account using the verification email sent to you.' : 'Your account is active, please login !'
