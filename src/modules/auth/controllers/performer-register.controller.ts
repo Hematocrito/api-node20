@@ -20,13 +20,13 @@ import { omit } from 'lodash';
 import { PERFORMER_STATUSES } from 'src/modules/performer/constants';
 import { SETTING_KEYS } from 'src/modules/settings/constants';
 import { SettingService } from 'src/modules/settings';
+import { UsernameExistedException } from 'src/modules/performer/exceptions';
+import { AuthGuard } from '@nestjs/passport';
+import { UserDto } from 'src/modules/user/dtos';
 import { REGISTER_EXCLUSIVE_FIELDS } from '../constants';
 import { PerformerRegisterPayload } from '../payloads';
 import { AuthService } from '../services';
-import { UsernameExistedException } from 'src/modules/performer/exceptions';
-import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser, Roles } from '../decorators';
-import { UserDto } from 'src/modules/user/dtos';
 import { RoleGuard } from '../guards';
 
 @Controller('auth/performers')
@@ -44,20 +44,20 @@ export class PerformerRegisterController {
     // TODO - check and support multiple files!!!
     MultiFileUploadInterceptor(
       [
-        {
-          type: 'performer-document',
-          fieldName: 'idVerification',
-          options: {
-            destination: 'private'
-          }
-        },
-        {
-          type: 'performer-document',
-          fieldName: 'documentVerification',
-          options: {
-            destination: 'private'
-          }
-        }
+      {
+      type: 'performer-document',
+      fieldName: 'idVerification',
+      options: {
+      destination: 'private'
+      }
+      },
+      {
+      type: 'performer-document',
+      fieldName: 'documentVerification',
+      options: {
+      destination: 'private'
+      }
+      }
       ],
       {}
     )
@@ -76,14 +76,14 @@ export class PerformerRegisterController {
         SETTING_KEYS.REQUIRE_EMAIL_VERIFICATION_PERFORMER
       );
       const data = omit(payload, REGISTER_EXCLUSIVE_FIELDS) as any;
-
+      /*
       let awsRecognize;
-      try{
+      try {
         awsRecognize = await this.authService.validateDocumentsRekognition(files.idVerification._id+"", files.documentVerification._id+"")
       }
       catch(err){
         throw new HttpException('Invalid Images', 400);
-      }
+      } */
 
       const performer = await this.performerService.register({
         ...data,
@@ -137,8 +137,8 @@ export class PerformerRegisterController {
           });
         }
       }
-
-      if(awsRecognize.FaceMatches){
+      /*
+      if (awsRecognize.FaceMatches){
         if(awsRecognize.FaceMatches[0].Similarity > 70){
           await this.performerService.update(performer._id.toString(), {
             verifiedAccount: true,
@@ -147,7 +147,7 @@ export class PerformerRegisterController {
             status: 'active'
           })
         }
-      }
+      } */
 
       return DataResponse.ok({
         message: requireEmailVerification ? 'Please verify your account using the verification email sent to you.' : 'Your account is active, please login !'
@@ -162,12 +162,12 @@ export class PerformerRegisterController {
 
   @Get('register/twitter')
   @UseGuards(AuthGuard('twitter-register-performer'))
-  async userRegisterTwitter(@Req() req){ }
+  async userRegisterTwitter(@Req() req) { }
 
   @Get('register/twitter/redirect')
   @UseGuards(AuthGuard('twitter-register-performer'))
   async userRegisterTwitterRedirect(@Req() req, @Res() res) {
-    try{
+    try {
       const twitterProfile = req.user;
 
       const performerCreatePayload = {
@@ -186,7 +186,7 @@ export class PerformerRegisterController {
         status: PERFORMER_STATUSES.ACTIVE,
         idVerificationId: null,
         documentVerificationId: null
-      }
+      };
 
       const performer = await this.performerService.register(dataPayload);
 
@@ -197,17 +197,17 @@ export class PerformerRegisterController {
           sourceId: performer._id,
           type: 'email',
           key: performer.email,
-          value: Math.random().toString(36),
+          value: Math.random().toString(36)
         }),
         this.authService.create({
           source: 'performer',
           sourceId: performer._id,
           type: 'username',
           key: performer.username,
-          value: Math.random().toString(36),
+          value: Math.random().toString(36)
         })
       ]);
-      
+
       const [authUser] = await Promise.all([
         performer && this.authService.findBySource({
           source: 'performer',
@@ -216,26 +216,25 @@ export class PerformerRegisterController {
         })
       ]);
 
-      let token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
+      const token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
 
-      return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=performer`)
-    }
-    catch(err){
-      if(err instanceof UsernameExistedException){
+      return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=performer`);
+    } catch (err) {
+      if (err instanceof UsernameExistedException) {
         return res.redirect(`${process.env.USER_URL}/oauth/login?error=user_has_been_taken`);
       }
       return res.redirect(`${process.env.USER_URL}/oauth/login?error=server_error`);
-    } 
+    }
   }
 
   @Get('register/google')
   @UseGuards(AuthGuard('google-register-performer'))
-  async userRegisterGoogle(@Req() req){ }
+  async userRegisterGoogle(@Req() req) { }
 
   @Get('register/google/redirect')
   @UseGuards(AuthGuard('google-register-performed'))
   async userRegisterGoogleRedirect(@Req() req, @Res() res) {
-    try{
+    try {
       const googleProfile = req.user;
 
       const performerCreatePayload = {
@@ -244,7 +243,7 @@ export class PerformerRegisterController {
         lastName: googleProfile.family_name,
         email: googleProfile.email,
         verifiedEmail: true,
-        username: googleProfile.email.split("@")[0]
+        username: googleProfile.email.split('@')[0]
       };
 
       const dataPayload: any = {
@@ -254,7 +253,7 @@ export class PerformerRegisterController {
         status: PERFORMER_STATUSES.ACTIVE,
         idVerificationId: null,
         documentVerificationId: null
-      }
+      };
 
       const performer = await this.performerService.register(dataPayload);
 
@@ -265,17 +264,17 @@ export class PerformerRegisterController {
           sourceId: performer._id,
           type: 'email',
           key: performer.email,
-          value: Math.random().toString(36),
+          value: Math.random().toString(36)
         }),
         this.authService.create({
           source: 'performer',
           sourceId: performer._id,
           type: 'username',
           key: performer.username,
-          value: Math.random().toString(36),
+          value: Math.random().toString(36)
         })
       ]);
-      
+
       const [authUser] = await Promise.all([
         performer && this.authService.findBySource({
           source: 'performer',
@@ -284,16 +283,15 @@ export class PerformerRegisterController {
         })
       ]);
 
-      let token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
+      const token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
 
-      return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=performer`)
-    }
-    catch(err){
-      if(err instanceof UsernameExistedException){
+      return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=performer`);
+    } catch (err) {
+      if (err instanceof UsernameExistedException) {
         return res.redirect(`${process.env.USER_URL}/oauth/login?error=user_has_been_taken`);
       }
       return res.redirect(`${process.env.USER_URL}/oauth/login?error=server_error`);
-    } 
+    }
   }
 
   @Roles('performer')
@@ -304,20 +302,20 @@ export class PerformerRegisterController {
     // TODO - check and support multiple files!!!
     MultiFileUploadInterceptor(
       [
-        {
-          type: 'performer-document',
-          fieldName: 'idVerification',
-          options: {
-            destination: 'private'
-          }
-        },
-        {
-          type: 'performer-document',
-          fieldName: 'documentVerification',
-          options: {
-            destination: 'private'
-          }
-        }
+      {
+      type: 'performer-document',
+      fieldName: 'idVerification',
+      options: {
+      destination: 'private'
+      }
+      },
+      {
+      type: 'performer-document',
+      fieldName: 'documentVerification',
+      options: {
+      destination: 'private'
+      }
+      }
       ],
       {}
     )
@@ -335,7 +333,7 @@ export class PerformerRegisterController {
       const requireEmailVerification = SettingService.getValueByKey(
         'requireEmailVerification'
       );
-      
+
       const performerResDTO = await this.performerService.addDocuments(performer._id, {
         idVerificationId: files.idVerification._id as any,
         documentVerificationId: files.documentVerification._id as any
@@ -352,7 +350,7 @@ export class PerformerRegisterController {
         message: requireEmailVerification ? 'We have sent an email to verify your email, please check your inbox.' : 'You have successfully registered.'
       });
     } catch (e) {
-      console.error(e)
+      console.error(e);
 
       files.idVerification && await this.fileService.remove(files.idVerification._id);
       files.documentVerification && await this.fileService.remove(files.documentVerification._id);
