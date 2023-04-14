@@ -147,23 +147,21 @@ export class MailerService {
 
   async sendEmail(email: IMail) {
     const { source, verificationLink, siteName } = email.data;
-    console.log('Link', email.data?.verificationLink);
+    console.log('Link', verificationLink);
     console.log('siteName', siteName);
     const mailOptions = {
       from: 'hitceate@gmail.com',
       to: email.to,
       subject: email.subject,
       html: `<p>Hi there,</p>
-      <p>Thank you for register at ${{ siteName }}. Please click <a href="${{ verificationLink }}" target="_blank">here</a> or copy link below to your browser to verify your email.</p>
-      <p>${{ verificationLink }}</p>`
+      <p>Thank you for register at ${siteName}. Please click <a href="${verificationLink}" target="_blank">here</a> or copy link below to your browser to verify your email.</p>
+      <p>${verificationLink}</p>`
     };
 
     try {
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('Correo electrónico enviado:', info);
       return info;
     } catch (error) {
-      console.log('Error al enviar el correo electrónico:', error);
       return error;
     }
   }

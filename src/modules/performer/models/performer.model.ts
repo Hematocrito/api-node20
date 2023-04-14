@@ -126,5 +126,4 @@ export class PerformerModel extends Document {
   bodyType: string;
 
   dateOfBirth: Date;
-
 }
