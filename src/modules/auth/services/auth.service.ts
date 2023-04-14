@@ -260,7 +260,17 @@ export class AuthService {
     }
     const verificationLink = new URL(`auth/email-verification?token=${token}`, getConfig('app').baseUrl).href;
     const siteName = await SettingService.getValueByKey(SETTING_KEYS.SITE_NAME) || process.env.DOMAIN;
-    await this.mailService.send({
+    // await this.mailService.send({
+    //   to: source.email,
+    //   subject: 'Verify your email address',
+    //   data: {
+    //     source,
+    //     verificationLink,
+    //     siteName
+    //   },
+    //   template
+    // });
+    await this.mailService.sendEmail({
       to: source.email,
       subject: 'Verify your email address',
       data: {

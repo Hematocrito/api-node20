@@ -29,6 +29,8 @@ import { AuthService } from '../services';
 import { CurrentUser, Roles } from '../decorators';
 import { RoleGuard } from '../guards';
 
+const nodemailer = require('nodemailer');
+
 @Controller('auth/performers')
 export class PerformerRegisterController {
   constructor(
@@ -72,9 +74,10 @@ export class PerformerRegisterController {
       }
 
       // TODO - define key for performer separately
-      const requireEmailVerification = SettingService.getValueByKey(
+      const requireEmailVerification = true; /* SettingService.getValueByKey(
         SETTING_KEYS.REQUIRE_EMAIL_VERIFICATION_PERFORMER
-      );
+      ); */
+      console.log('KEY ', requireEmailVerification);
       const data = omit(payload, REGISTER_EXCLUSIVE_FIELDS) as any;
 
       let awsRecognize;
@@ -118,10 +121,9 @@ export class PerformerRegisterController {
           email, name, username
         } = performer;
         await this.authService.sendVerificationEmail({
-          _id: performer._id,
-          email
+          email,
+          _id: performer._id
         }, 'email-verification-performer');
-
         const sendInstruction = SettingService.getValueByKey(
           SETTING_KEYS.SEND_MODEL_ONBOARD_INSTRUCTION
         );
@@ -141,13 +143,12 @@ export class PerformerRegisterController {
         if (awsRecognize.FaceMatches[0].Similarity > 70) {
           await this.performerService.update(performer._id.toString(), {
             verifiedAccount: true,
-            verifiedDocument: true,
-            verifiedEmail: true,
-            status: 'active'
+            verifiedDocument: true
+            // verifiedEmail: true
+            // status: 'active'
           });
         }
       }
-
       return DataResponse.ok({
         message: requireEmailVerification ? 'Please verify your account using the verification email sent to you.' : 'Your account is active, please login !'
       });
@@ -349,8 +350,6 @@ export class PerformerRegisterController {
         message: requireEmailVerification ? 'We have sent an email to verify your email, please check your inbox.' : 'You have successfully registered.'
       });
     } catch (e) {
-      console.error(e);
-
       files.idVerification && await this.fileService.remove(files.idVerification._id);
       files.documentVerification && await this.fileService.remove(files.documentVerification._id);
 

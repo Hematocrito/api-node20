@@ -1,3 +1,9 @@
+export interface IMailData {
+  source: string;
+  verificationLink: string;
+  siteName: string;
+}
+
 export interface IMail {
   template?: string;
   layout?: string;
@@ -8,5 +14,5 @@ export interface IMail {
   subject: string;
   text?: string;
   html?: string;
-  data?: any;
+  data?: any | IMailData;
 }

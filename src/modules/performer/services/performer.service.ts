@@ -855,7 +855,10 @@ export class PerformerService {
       {
         _id: userId
       },
-      { verifiedEmail: true }
+      {
+        verifiedEmail: true,
+        status: 'active'
+      }
     );
   }
 

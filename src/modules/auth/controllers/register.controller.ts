@@ -19,12 +19,12 @@ import { STATUS_ACTIVE, ROLE_USER } from 'src/modules/user/constants';
 import { Response } from 'express';
 import { omit } from 'lodash';
 import { SETTING_KEYS } from 'src/modules/settings/constants';
+import { AuthGuard } from '@nestjs/passport';
+import { EmailHasBeenTakenException } from 'src/modules/user/exceptions';
 import { REGISTER_EXCLUSIVE_FIELDS } from '../constants';
 import { AuthCreateDto } from '../dtos';
 import { UserRegisterPayload } from '../payloads';
 import { AuthService } from '../services';
-import { AuthGuard } from '@nestjs/passport';
-import { EmailHasBeenTakenException } from 'src/modules/user/exceptions';
 
 @Controller('auth')
 export class RegisterController {
@@ -91,12 +91,12 @@ export class RegisterController {
 
   @Get('users/register/twitter')
   @UseGuards(AuthGuard('twitter-register'))
-  async userRegisterTwitter(@Req() req){ }
+  async userRegisterTwitter(@Req() req) { }
 
   @Get('users/register/twitter/redirect')
   @UseGuards(AuthGuard('twitter-register'))
   async userRegisterTwitterRedirect(@Req() req, @Res() res) {
-    try{
+    try {
       const twitterProfile = req.user;
 
       const userCreatePayload:any = {
@@ -107,12 +107,12 @@ export class RegisterController {
         verifiedEmail: true,
         username: twitterProfile.username
       };
-      
+
       const user = await this.userService.create(userCreatePayload, {
         status: STATUS_ACTIVE,
         roles: ROLE_USER
       });
-    
+
       await Promise.all([
         this.authService.create(new AuthCreateDto({
           source: 'user',
@@ -138,26 +138,25 @@ export class RegisterController {
         })
       ]);
 
-      let token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
+      const token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
 
-      return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=user`)
-    }
-    catch(err){
-      if(err instanceof EmailHasBeenTakenException){
+      return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=user`);
+    } catch (err) {
+      if (err instanceof EmailHasBeenTakenException) {
         return res.redirect(`${process.env.USER_URL}/oauth/login?error=user_has_been_taken`);
       }
       return res.redirect(`${process.env.USER_URL}/oauth/login?error=server_error`);
-    } 
+    }
   }
 
   @Get('users/register/google')
   @UseGuards(AuthGuard('google-register'))
-  async userRegisterGoogle(@Req() req){ }
+  async userRegisterGoogle(@Req() req) { }
 
   @Get('users/register/google/redirect')
   @UseGuards(AuthGuard('google-register'))
   async userRegisterGoogleRedirect(@Req() req, @Res() res) {
-    try{
+    try {
       const googleProfile = req.user;
 
       const userCreatePayload: any = {
@@ -166,7 +165,7 @@ export class RegisterController {
         lastName: googleProfile.family_name,
         email: googleProfile.email,
         verifiedEmail: true,
-        username: googleProfile.email.split("@")[0]
+        username: googleProfile.email.split('@')[0]
       };
       const user = await this.userService.create(userCreatePayload, {
         status: STATUS_ACTIVE,
@@ -186,7 +185,7 @@ export class RegisterController {
           sourceId: user._id,
           type: 'username',
           value: Math.random().toString(36),
-          key: googleProfile.email.split("@")[0]
+          key: googleProfile.email.split('@')[0]
         }))
       ]);
 
@@ -198,15 +197,14 @@ export class RegisterController {
         })
       ]);
 
-      let token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
+      const token = this.authService.generateJWT(authUser, { expiresIn: 60 * 60 * 24 * 1 });
 
       return res.redirect(`${process.env.USER_URL}/oauth/login?token=${token}&source=user`);
-    }
-    catch(err){
-      if(err instanceof EmailHasBeenTakenException){
+    } catch (err) {
+      if (err instanceof EmailHasBeenTakenException) {
         return res.redirect(`${process.env.USER_URL}/oauth/login?error=user_has_been_taken`);
       }
       return res.redirect(`${process.env.USER_URL}/oauth/login?error=server_error`);
-    } 
+    }
   }
 }

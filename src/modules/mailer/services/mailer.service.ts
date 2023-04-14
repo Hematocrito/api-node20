@@ -3,6 +3,8 @@ import {
   EntityNotFoundException, QueueService, SearchRequest, StringHelper
 } from 'src/kernel';
 import { createTransport } from 'nodemailer';
+import * as nodemailer from 'nodemailer';
+import * as smtpTransport from 'nodemailer-smtp-transport';
 import { SettingService } from 'src/modules/settings';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
@@ -19,6 +21,8 @@ const TEMPLATE_DIR = join(process.env.TEMPLATE_DIR, 'emails');
 export class MailerService {
   private mailerQueue;
 
+  private transporter: nodemailer.Transporter;
+
   constructor(
     private readonly queueService: QueueService,
     private readonly settingService: SettingService,
@@ -26,6 +30,17 @@ export class MailerService {
     private readonly EmailTemplate: Model<EmailTemplateModel>
   ) {
     this.init();
+    this.transporter = nodemailer.createTransport(
+      smtpTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'hitceate@gmail.com',
+          pass: 'kcdythrininubnyf'
+        }
+      })
+    );
   }
 
   private async init() {
@@ -126,7 +141,31 @@ export class MailerService {
   }
 
   public async send(email: IMail) {
-    await this.mailerQueue.createJob(email).save();
+    const mailSended = await this.mailerQueue.createJob(email).save();
+    return mailSended;
+  }
+
+  async sendEmail(email: IMail) {
+    const { source, verificationLink, siteName } = email.data;
+    console.log('Link', email.data?.verificationLink);
+    console.log('siteName', siteName);
+    const mailOptions = {
+      from: 'hitceate@gmail.com',
+      to: email.to,
+      subject: email.subject,
+      html: `<p>Hi there,</p>
+      <p>Thank you for register at ${{ siteName }}. Please click <a href="${{ verificationLink }}" target="_blank">here</a> or copy link below to your browser to verify your email.</p>
+      <p>${{ verificationLink }}</p>`
+    };
+
+    try {
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Correo electrónico enviado:', info);
+      return info;
+    } catch (error) {
+      console.log('Error al enviar el correo electrónico:', error);
+      return error;
+    }
   }
 
   public async verify() {

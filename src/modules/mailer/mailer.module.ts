@@ -8,13 +8,13 @@ import { emailTemplateProviders } from './providers';
 
 @Module({
   imports: [
-    MongoDBModule,
-    QueueModule.forRoot(),
-    forwardRef(() => AuthModule),
-    forwardRef(() => SettingModule)
+  MongoDBModule,
+  QueueModule.forRoot(),
+  forwardRef(() => AuthModule),
+  forwardRef(() => SettingModule)
   ],
   providers: [MailerService, ...emailTemplateProviders],
   controllers: [MailerController],
   exports: [MailerService]
-})
+  })
 export class MailerModule {}
