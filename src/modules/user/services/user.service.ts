@@ -111,6 +111,7 @@ export class UserService {
       user.name = [user.firstName || '', user.lastName || ''].join(' ');
     }
     const resp = await this.userModel.create(user);
+    console.log('RESP ', resp);
     return resp;
   }
 
@@ -256,7 +257,10 @@ export class UserService {
       {
         _id: userId
       },
-      { verifiedEmail: true, status: STATUS_ACTIVE }
+      {
+        verifiedEmail: true,
+        status: STATUS_ACTIVE
+      }
     );
   }
 

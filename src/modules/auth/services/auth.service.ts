@@ -258,7 +258,11 @@ export class AuthService {
         return verification.save();
       }));
     }
+    console.log('entorno', process.env);
+
     const verificationLink = new URL(`auth/email-verification?token=${token}`, getConfig('app').baseUrl).href;
+    // verificationLink = `${process.env.BASE_URL_PROD}auth/email-verification?token=${token}`;
+
     const siteName = await SettingService.getValueByKey(SETTING_KEYS.SITE_NAME) || process.env.DOMAIN;
     // await this.mailService.send({
     //   to: source.email,
@@ -283,6 +287,7 @@ export class AuthService {
   }
 
   async verifyEmail(token: string): Promise<void> {
+    console.log('Paso 2=====');
     const verifications = await this.verificationModel.find({
       token
     });

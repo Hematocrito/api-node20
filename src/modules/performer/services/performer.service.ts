@@ -23,7 +23,9 @@ import { merge } from 'lodash';
 import { isObjectId } from 'src/kernel/helpers/string.helper';
 import { PerformerBlockService } from 'src/modules/block/services';
 import { SocketUserService } from 'src/modules/socket/services/socket-user.service';
-import { PERFORMER_UPDATE_STATUS_CHANNEL, DELETE_PERFORMER_CHANNEL, PERFORMER_CHANNEL } from '../constants';
+import {
+  PERFORMER_UPDATE_STATUS_CHANNEL, DELETE_PERFORMER_CHANNEL, PERFORMER_CHANNEL, PERFORMER_STATUSES
+} from '../constants';
 import { PerformerDto } from '../dtos';
 import {
   UsernameExistedException, EmailExistedException
@@ -857,7 +859,7 @@ export class PerformerService {
       },
       {
         verifiedEmail: true,
-        status: 'active'
+        status: PERFORMER_STATUSES.ACTIVE
       }
     );
   }

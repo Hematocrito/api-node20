@@ -77,7 +77,6 @@ export class PerformerRegisterController {
       const requireEmailVerification = true; /* SettingService.getValueByKey(
         SETTING_KEYS.REQUIRE_EMAIL_VERIFICATION_PERFORMER
       ); */
-      console.log('KEY ', requireEmailVerification);
       const data = omit(payload, REGISTER_EXCLUSIVE_FIELDS) as any;
 
       let awsRecognize;
