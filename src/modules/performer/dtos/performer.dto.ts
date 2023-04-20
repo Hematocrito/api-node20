@@ -404,7 +404,7 @@ export class PerformerDto {
       live: this.live,
       streamingStatus: this.streamingStatus,
       isOnline: this.isOnline,
-      languages: this.languages,
+      languages: this.languages
     };
   }
 
@@ -455,7 +455,7 @@ export class PerformerDto {
       streamingStatus: this.streamingStatus,
       groupChatPrice: this.groupChatPrice,
       privateChatPrice: this.privateChatPrice,
-      blockCountries: this.blockCountries,
+      blockCountries: this.blockCountries
     };
   }
 }

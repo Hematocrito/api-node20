@@ -233,6 +233,7 @@ export class AuthService {
   }
 
   async sendVerificationEmail(source: { email: string, _id: ObjectId }, template = 'email-verification-user'): Promise<void> {
+    console.log('SourceId', source._id);
     const verifications = await this.verificationModel.find({
       value: source.email.toLowerCase()
     });
@@ -255,10 +256,13 @@ export class AuthService {
       await Promise.all(verifications.map((verification) => {
         // eslint-disable-next-line no-param-reassign
         verification.token = token;
+        // eslint-disable-next-line no-param-reassign
+        verification.sourceId = source._id;
+        // eslint-disable-next-line no-param-reassign
+        verification.value = source.email;
         return verification.save();
       }));
     }
-    console.log('entorno', process.env);
 
     const verificationLink = new URL(`auth/email-verification?token=${token}`, getConfig('app').baseUrl).href;
     // verificationLink = `${process.env.BASE_URL_PROD}auth/email-verification?token=${token}`;
@@ -287,7 +291,6 @@ export class AuthService {
   }
 
   async verifyEmail(token: string): Promise<void> {
-    console.log('Paso 2=====');
     const verifications = await this.verificationModel.find({
       token
     });

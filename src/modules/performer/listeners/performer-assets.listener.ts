@@ -50,7 +50,7 @@ export class PerformerAssetsListener {
 
       switch (eventName) {
         case EVENT.CREATED:
-          if (status === PHOTO_STATUS.ACTIVE) increase = 1;
+          if (status === PHOTO_STATUS.ACTIVE) increase += 1;
           break;
         case EVENT.UPDATED:
           if (
@@ -63,7 +63,7 @@ export class PerformerAssetsListener {
           ) increase = -1;
           break;
         case EVENT.DELETED:
-          if (status === PHOTO_STATUS.ACTIVE) increase = -1;
+          if (status === PHOTO_STATUS.ACTIVE) increase -= 1;
           break;
         default:
           break;
@@ -96,20 +96,21 @@ export class PerformerAssetsListener {
 
       switch (eventName) {
         case EVENT.CREATED:
-          if (status === VIDEO_STATUS.ACTIVE) increase = 1;
+          console.log('video subido');
+          if (status === VIDEO_STATUS.ACTIVE) increase += 1;
           break;
         case EVENT.UPDATED:
           if (
             oldStatus !== VIDEO_STATUS.ACTIVE
             && status === VIDEO_STATUS.ACTIVE
-          ) increase = 1;
+          ) increase += 1;
           if (
             oldStatus === VIDEO_STATUS.ACTIVE
             && status !== VIDEO_STATUS.ACTIVE
-          ) increase = -1;
+          ) increase -= 1;
           break;
         case EVENT.DELETED:
-          if (status === VIDEO_STATUS.ACTIVE) increase = -1;
+          if (status === VIDEO_STATUS.ACTIVE) increase -= 1;
           break;
         default:
           break;

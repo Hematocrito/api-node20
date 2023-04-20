@@ -212,6 +212,7 @@ export class VideoService {
     creator?: UserDto
   ): Promise<VideoDto> {
     let valid = true;
+
     if (!video) valid = false;
 
     if (!valid && thumbnail) {
@@ -239,6 +240,7 @@ export class VideoService {
     }
     const model = new this.PerformerVideoModel(payload);
     model.fileId = video._id;
+
     if (!model.performerId && creator) {
       model.performerId = creator._id;
     }

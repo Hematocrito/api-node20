@@ -79,6 +79,7 @@ export class PerformerVideosController {
       payload,
       uploader
     );
+
     return DataResponse.ok(resp);
   }
 

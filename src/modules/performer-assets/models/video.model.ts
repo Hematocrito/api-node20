@@ -36,7 +36,7 @@ export class VideoModel extends Document {
     likes: number;
     favourites: number;
     wishlists: number;
-    views: number,
+    views: number;
     comments: number
   };
 
