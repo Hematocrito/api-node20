@@ -15,8 +15,9 @@ import { StringHelper } from 'src/kernel';
 import { FileService } from '../services';
 import { transformException } from '../lib/multer/multer.utils';
 import { IFileUploadOptions } from '../lib';
-var aws = require('aws-sdk');
-var multerS3 = require('multer-s3');
+
+const aws = require('aws-sdk');
+const multerS3 = require('multer-s3');
 
 export interface IMultiFileUpload {
   type: string;
@@ -60,21 +61,21 @@ export function MultiFileUploadInterceptor(data: IMultiFileUpload[], opts = {} a
         }
       });
 
-      var s3 = new aws.S3({
+      const s3 = new aws.S3({
         accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_S3_SECRET,
         Bucket: process.env.AWS_S3_BUCKET
-      })
+      });
 
       const upload = multer({
         limits: {
-          fileSize: 20971520, // 10 Mb
+          fileSize: 20971520 // 10 Mb
         },
         storage: multerS3({
-          s3: s3,
+          s3,
           bucket: process.env.AWS_S3_BUCKET,
           contentType: multerS3.AUTO_CONTENT_TYPE,
-          metadata: function (req, file, cb) {
+          metadata(req, file, cb) {
             cb(null, { fieldName: file.fieldname });
           },
           key(req, file, cb) {
@@ -91,8 +92,7 @@ export function MultiFileUploadInterceptor(data: IMultiFileUpload[], opts = {} a
               `${randomText}-${orgName}`
             ).toLocaleLowerCase() + ext;
 
-            if(uploadDir[file.fieldname])
-              name = uploadDir[file.fieldname]+"/"+name;
+            if (uploadDir[file.fieldname]) { name = `${uploadDir[file.fieldname]}/${name}`; }
 
             return cb(null, name);
           }
