@@ -119,12 +119,18 @@ export class PhotoService {
     }
     photo.processing = true;
     await photo.save();
+
     const galleries = await this.photoModel.find({ galleryId: photo.galleryId });
-    console.log('FOTOS ', galleries.length);
+
     if (galleries.length > 0) {
       const gallery = await this.galleryModel.findById(photo.galleryId);
       gallery.numOfItems = galleries.length;
       gallery.save();
+
+      // Actualiazando stats.totalPhotos del performer
+      const performerUpdated = await this.performerService.findById(creator._id);
+      performerUpdated.stats.totalPhotos = galleries.length;
+      performerUpdated.save();
     }
 
     await Promise.all([
