@@ -462,20 +462,13 @@ export class VideoService {
 
   public async delete(id: string | ObjectId) {
     const video = await this.PerformerVideoModel.findById(id);
+
     if (!video) {
       throw new EntityNotFoundException();
     }
 
     await video.remove();
 
-    const totalVideos = await this.PerformerVideoModel.find({
-      performerId: new ObjectId(video.performerId)
-    });
-    if (totalVideos.length > 0) {
-      const performerUpdated = await this.performerService.findById(video.performerId);
-      performerUpdated.stats.totalVideos = totalVideos.length;
-      await performerUpdated.save();
-    }
     video.fileId && (await this.fileService.remove(video.fileId));
     video.thumbnailId && (await this.fileService.remove(video.fileId));
     await this.queueEventService.publish(

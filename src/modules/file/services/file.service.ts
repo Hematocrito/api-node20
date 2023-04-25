@@ -90,13 +90,13 @@ export class FileService {
     multerData: IMulterUploadedFile | any,
     options?: IFileUploadOptions
   ): Promise<FileDto> {
-    console.log(multerData)
+    console.log(multerData);
     // eslint-disable-next-line no-param-reassign
     options = options || {};
     const publicDir = this.config.get('file.publicDir');
     const photoDir = this.config.get('file.photoDir');
     const thumbnails = [];
-    let blurImagePath = '';
+    const blurImagePath = '';
     // replace new photo without exif, ignore video
     // if (multerData.mimetype.includes('image')) {
     //   const buffer = await this.imageService.replaceWithoutExif(multerData.path);
@@ -518,102 +518,101 @@ export class FileService {
     }
   }
 
-  async uploadVideo(file) {    
+  async uploadVideo(file) {
     const { originalname } = file;
     const bucketS3 = process.env.AWS_S3_BUCKET;
-    //return await this.uploadS3(file.buffer, bucketS3, originalname);
+    // return await this.uploadS3(file.buffer, bucketS3, originalname);
 
     const fileUploaded: {} = await this.uploadS3(file.buffer, bucketS3, originalname);
-    const copyFile = Object.assign(fileUploaded)
-    const{Location} = copyFile
-    const fileCreated = await this.fileModel.create({"type":"performer-video","absolutePath":Location});
+    const copyFile = Object.assign(fileUploaded);
+    const { Location } = copyFile;
+    const fileCreated = await this.fileModel.create({ type: 'performer-video', absolutePath: Location });
     fileCreated.save();
-    
+
     return {
       fileUploaded,
       fileCreated
-    }
+    };
   }
 
   async upload(file) {
     const { originalname } = file;
     const bucketS3 = process.env.AWS_S3_BUCKET;
-    return await this.uploadS3(file.buffer, bucketS3, originalname);
+    await this.uploadS3(file.buffer, bucketS3, originalname);
   }
 
   async uploadPhotFeed(file) {
     const { originalname } = file;
     const bucketS3 = process.env.AWS_S3_BUCKET;
-    //return await this.uploadS3(file.buffer, bucketS3, originalname);
+    // return await this.uploadS3(file.buffer, bucketS3, originalname);
 
     const fileUploaded: {} = await this.uploadS3(file.buffer, bucketS3, originalname);
-    const copyFile = Object.assign(fileUploaded)
-    const{Location} = copyFile
-    const fileCreated = await this.fileModel.create({"type":"photo-feed","absolutePath":Location});
+    const copyFile = Object.assign(fileUploaded);
+    const { Location } = copyFile;
+    const fileCreated = await this.fileModel.create({ type: 'photo-feed', absolutePath: Location });
     fileCreated.save();
-    
+
     return {
       fileCreated
-    }
+    };
   }
 
   async uploadAvatar(file) {
     const { originalname } = file;
     const bucketS3 = process.env.AWS_S3_BUCKET;
-    //return await this.uploadS3(file.buffer, bucketS3, originalname);
+    // return await this.uploadS3(file.buffer, bucketS3, originalname);
 
     const fileUploaded: {} = await this.uploadS3(file.buffer, bucketS3, originalname);
-    const copyFile = Object.assign(fileUploaded)
-    const{Location} = copyFile
-    const fileCreated = await this.fileModel.create({"type":"avatar","absolutePath":Location});
+    const copyFile = Object.assign(fileUploaded);
+    const { Location } = copyFile;
+    const fileCreated = await this.fileModel.create({ type: 'avatar', absolutePath: Location });
     fileCreated.save();
-    
+
     return {
       fileUploaded,
       fileCreated
-    }
+    };
   }
 
   async uploadCover(file) {
     const { originalname } = file;
     const bucketS3 = process.env.AWS_S3_BUCKET;
-    //return await this.uploadS3(file.buffer, bucketS3, originalname);
+    // return await this.uploadS3(file.buffer, bucketS3, originalname);
 
     const fileUploaded: {} = await this.uploadS3(file.buffer, bucketS3, originalname);
-    const copyFile = Object.assign(fileUploaded)
-    const{Location} = copyFile
-    const fileCreated = await this.fileModel.create({"type":"cover","absolutePath":Location});
+    const copyFile = Object.assign(fileUploaded);
+    const { Location } = copyFile;
+    const fileCreated = await this.fileModel.create({ type: 'cover', absolutePath: Location });
     fileCreated.save();
-    
+
     return {
       fileUploaded,
       fileCreated
-    }
+    };
   }
 
   async uploadS3(file, bucket, name) {
     const s3 = this.getS3();
     const params = {
-        Bucket: bucket,
-        Key: String(name),
-        Body: file,
+      Bucket: bucket,
+      Key: String(name),
+      Body: file
     };
     return new Promise((resolve, reject) => {
-        s3.upload(params, (err, data) => {
+      s3.upload(params, (err, data) => {
         if (err) {
-            Logger.error(err);
-            reject(err.message);
+          Logger.error(err);
+          reject(err.message);
         }
         resolve(data);
-        });
+      });
     });
   }
 
   getS3() {
     return new S3({
-        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_S3_SECRET,
+      accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_S3_SECRET
     });
-  } 
-
+  }
 }
