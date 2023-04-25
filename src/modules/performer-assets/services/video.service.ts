@@ -266,10 +266,10 @@ export class VideoService {
 
     if (dto) {
       const totalVideos = await this.PerformerVideoModel.find({
-        performerId: new ObjectId(payload.performerId)
+        performerId: new ObjectId(dto.performerId)
       });
       if (totalVideos.length > 0) {
-        const performerUpdated = await this.performerService.findById(payload.performerId);
+        const performerUpdated = await this.performerService.findById(dto.performerId);
         performerUpdated.stats.totalVideos = totalVideos.length;
         await performerUpdated.save();
       }
