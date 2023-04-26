@@ -120,16 +120,16 @@ export class PhotoService {
     photo.processing = true;
     await photo.save();
 
-    const galleries = await this.photoModel.find({ galleryId: photo.galleryId });
+    const totalPhotos = await this.photoModel.find({ galleryId: photo.galleryId });
 
-    if (galleries.length > 0) {
+    if (totalPhotos.length > 0) {
       const gallery = await this.galleryModel.findById(photo.galleryId);
-      gallery.numOfItems = galleries.length;
+      gallery.numOfItems = totalPhotos.length;
       gallery.save();
 
       // Actualiazando stats.totalPhotos del performer
       const performerUpdated = await this.performerService.findById(creator._id);
-      performerUpdated.stats.totalPhotos = galleries.length;
+      performerUpdated.stats.totalPhotos = totalPhotos.length;
       performerUpdated.save();
     }
 
@@ -247,6 +247,17 @@ export class PhotoService {
     const dto = new PhotoDto(photo);
 
     await photo.remove();
+
+    // Actualizando al performer
+    const totalPhotos = await this.photoModel.find({ performerId: photo.performerId });
+
+    if (totalPhotos.length >= 0) {
+      // Actualiazando stats.totalPhotos del performer
+      const performerUpdated = await this.performerService.findById(photo.performerId);
+      performerUpdated.stats.totalPhotos = totalPhotos.length;
+      performerUpdated.save();
+    }
+
     // TODO - should check ref and remove
     await this.fileService.remove(photo.fileId);
     photo.galleryId && await this.galleryService.updatePhotoStats(photo.galleryId, -1);
