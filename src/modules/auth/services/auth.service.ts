@@ -264,8 +264,8 @@ export class AuthService {
       }));
     }
 
-    const verificationLink = new URL(`auth/email-verification?token=${token}`, getConfig('app').baseUrl).href;
-    // verificationLink = `${process.env.BASE_URL_PROD}auth/email-verification?token=${token}`;
+    // const verificationLink = new URL(`auth/email-verification?token=${token}`, getConfig('app').baseUrl).href;
+    const verificationLink = `${process.env.BASE_URL_PROD}auth/email-verification?token=${token}`;
 
     const siteName = await SettingService.getValueByKey(SETTING_KEYS.SITE_NAME) || process.env.DOMAIN;
     // await this.mailService.send({
