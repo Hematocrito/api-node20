@@ -232,8 +232,7 @@ export class AuthService {
     return this.forgotModel.findOne({ token });
   }
 
-  async sendVerificationEmail(source: { email: string, _id: ObjectId }, template = 'email-verification-user'): Promise<void> {
-    console.log('SourceId', source._id);
+  async sendVerificationEmail(source: { email: string, _id: ObjectId }, template = 'email-verification-performer'): Promise<void> {
     const verifications = await this.verificationModel.find({
       value: source.email.toLowerCase()
     });
