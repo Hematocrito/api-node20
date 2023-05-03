@@ -9,7 +9,8 @@ import {
   Body,
   Put,
   Query,
-  Param
+  Param,
+  Delete
 } from '@nestjs/common';
 import { AuthGuard, RoleGuard } from 'src/modules/auth/guards';
 import { CurrentUser, Roles } from 'src/modules/auth/decorators';
@@ -47,6 +48,14 @@ export class UserController {
     await this.userService.update(currentUser._id, data, currentUser);
     const user = await this.userService.findById(currentUser._id);
     return DataResponse.ok(new UserDto(user).toResponse(true));
+  }
+
+  @Delete('/:id')
+  @UseGuards(RoleGuard)
+  @HttpCode(HttpStatus.OK)
+  async remove(@Param('id') id: string) {
+    const result = await this.userService.delete(id);
+    return result.deleted;
   }
 
   @Get('/search')
