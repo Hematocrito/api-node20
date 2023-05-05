@@ -147,15 +147,28 @@ export class MailerService {
 
   async sendEmail(email: IMail) {
     const { source, verificationLink, siteName } = email.data;
-    console.log('Link', verificationLink);
-    console.log('siteName', siteName);
+    // console.log('Link', verificationLink);
+    // console.log('siteName', siteName);
     const mailOptions = {
       from: 'hitceate@gmail.com',
       to: email.to,
       subject: email.subject,
-      html: `<p>Hi there,</p>
-      <p>Thank you for register at ${siteName}. Please click <a href="${verificationLink}" target="_blank">here</a> or copy link below to your browser to verify your email.</p>
-      <p>${verificationLink}</p>`
+      html: `<img src="https://myadultfan.com/logo.png" width="30%" height="42px" style="float: left; object-fit: contain;">
+<div style="background-color: #00B2FF; width: 70%; height: 42px; float: left;"></div>
+<img src="https://myadultfan.com/img-email.jpg" width="100%" height="auto" >    
+<div style="background-color: #00B2FF; width: 100%; height: 42px;">
+    <p style="color:white; text-align: center; margin: 0; padding-top: 14px; font-family: Arial, Helvetica, sans-serif; font-size: small;">
+        Please Confirm Your Account To Get Started
+    </p>
+</div>
+<h1 style="font-family: Arial, Helvetica, sans-serif; font-size: 18px; margin-left: 45px; margin-top: 30px;">Welcome to MyAdultFan</h1>
+<p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin-left: 45px;">Hi there,</p>
+<p style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; margin-left: 45px; margin-right: 40px;">
+    Thank you for register at ${siteName}. Please click 
+    <a style="color: #00B2FF;" href="${verificationLink}" target="_blank">here</a> 
+    or copy link below to your browser to verify your email.
+</p>
+<p style="color: #00B2FF; margin-left: 40px;">${verificationLink}</p>`
     };
 
     try {

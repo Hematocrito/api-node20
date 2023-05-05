@@ -300,16 +300,28 @@ export class AuthService {
     for (const verification of verifications) {
       if (verification.sourceType === 'user') {
         // eslint-disable-next-line no-await-in-loop
-        await this.userService.updateVerificationStatus(verification.sourceId);
+        const user = await this.userService.updateVerificationStatus(verification.sourceId);
+        console.log('console 1 ', user);
+        // eslint-disable-next-line no-param-reassign
+        verification.verified = true;
+        // eslint-disable-next-line no-await-in-loop
+        const save = await verification.save();
+        break;
       }
       if (verification.sourceType === 'performer') {
         // eslint-disable-next-line no-await-in-loop
         await this.performerService.updateVerificationStatus(verification.sourceId);
+        console.log('console 2');
+        // eslint-disable-next-line no-param-reassign
+        verification.verified = true;
+        // eslint-disable-next-line no-await-in-loop
+        const save = await verification.save();
+        break;
       }
       // eslint-disable-next-line no-param-reassign
       verification.verified = true;
       // eslint-disable-next-line no-await-in-loop
-      await verification.save();
+      const save = await verification.save();
     }
   }
 

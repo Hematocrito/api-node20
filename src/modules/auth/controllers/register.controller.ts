@@ -65,9 +65,9 @@ export class RegisterController {
       _id: user._id,
       email: user.email
     });
-    const requireEmailVerification = SettingService.getValueByKey(
+    const requireEmailVerification = true; /* SettingService.getValueByKey(
       SETTING_KEYS.REQUIRE_EMAIL_VERIFICATION_USER
-    );
+    ); */
     return DataResponse.ok({
       message: requireEmailVerification ? 'Please verify your account using the verification email sent to you.' : 'Your account is active, please login !'
     });
