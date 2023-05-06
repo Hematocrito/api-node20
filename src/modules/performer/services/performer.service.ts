@@ -852,9 +852,9 @@ export class PerformerService {
     userId: string | ObjectId
   ): Promise<any> {
     const user = await this.performerModel.findById(userId);
-    const performers = await this.performerModel.find();
-    if (!user) throw new BadRequestException('User does not exist');
-    const performerUpdated = await this.performerModel.updateOne(
+    console.log('user', user);
+    if (!user) return true;
+    return this.performerModel.updateOne(
       {
         _id: userId
       },
@@ -863,7 +863,6 @@ export class PerformerService {
         status: PERFORMER_STATUSES.ACTIVE
       }
     );
-    return performerUpdated;
   }
 
   public async getCommissions(performerId: string | ObjectId) {
