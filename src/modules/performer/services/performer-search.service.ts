@@ -119,9 +119,14 @@ export class PerformerSearchService {
         query[f] = req[f];
       }
     });
+
+    // Si hay usuario logueado entra aquí
     if (user) {
+      // no equal: mostrar performers diferentes al usuario loqueado
       query._id = { $ne: user._id };
     }
+
+    // Si hay performersIds entra acá
     if (req.performerIds) {
       query._id = Array.isArray(req.performerIds) ? { $in: req.performerIds } : { $in: [req.performerIds] };
     }
