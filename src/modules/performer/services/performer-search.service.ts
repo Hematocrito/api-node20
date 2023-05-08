@@ -197,6 +197,39 @@ export class PerformerSearchService {
     };
   }
 
+  public async searchForPerformer(req: PerformerSearchPayload, user: UserDto) {
+    console.log(req);
+    console.log(user);
+
+    let sort = {
+      createdAt: -1
+    } as any;
+    if (req.sortBy === 'latest') {
+      sort = '-createdAt';
+    }
+    if (req.sortBy === 'oldest') {
+      sort = 'createdAt';
+    }
+    if (req.sortBy === 'popular') {
+      sort = '-score';
+    }
+    if (req.sortBy === 'subscriber') {
+      sort = '-stats.subscribers';
+    }
+
+    const performers = await this.performerModel
+      .find({
+        status: PERFORMER_STATUSES.ACTIVE
+      })
+      .limit(req.limit ? parseInt(req.limit as string, 10) : 10)
+      .sort(sort);
+
+    return {
+      data: performers.map((item) => new PerformerDto(item).toResponse(false)),
+      total: performers.length
+    };
+  }
+
   public async searchByKeyword(
     req: PerformerSearchPayload
   ): Promise<any> {

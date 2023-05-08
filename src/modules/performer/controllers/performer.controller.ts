@@ -79,6 +79,7 @@ export class PerformerController {
     return DataResponse.ok(data);
   }
 
+  // Este método fue reemplazado por @Get('/getAll'), ya que había inconsistencia @Get('/search') al momento de mandar la respuesta al cliente(front)
   @Get('/search')
   @UseGuards(LoadUser)
   @HttpCode(HttpStatus.OK)
@@ -97,6 +98,19 @@ export class PerformerController {
       }
     }
     const data = await this.performerSearchService.search(query, user, countryCode);
+    return DataResponse.ok(data);
+  }
+
+  @Get('/getAll')
+  @UseGuards(LoadUser)
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getAll(
+    @Query() query: PerformerSearchPayload,
+    @Request() req: any,
+    @CurrentUser() user: UserDto
+  ): Promise<DataResponse<PageableData<IPerformerResponse>>> {
+    const data = await this.performerSearchService.searchForPerformer(query, user);
     return DataResponse.ok(data);
   }
 

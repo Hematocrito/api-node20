@@ -264,7 +264,7 @@ export class AuthService {
     }
 
     // const verificationLink = new URL(`auth/email-verification?token=${token}`, getConfig('app').baseUrl).href;
-    const verificationLink = `${process.env.BASE_URL_PROD}auth/email-verification?token=${token}`;
+    const verificationLink = `${process.env.BASE_URL_PROD}/auth/email-verification?token=${token}`;
 
     const siteName = await SettingService.getValueByKey(SETTING_KEYS.SITE_NAME) || process.env.DOMAIN;
     // await this.mailService.send({
@@ -301,12 +301,10 @@ export class AuthService {
       if (verification.sourceType === 'user') {
         // eslint-disable-next-line no-await-in-loop
         const user = await this.userService.updateVerificationStatus(verification.sourceId);
-        console.log('console 1', user);
       }
       if (verification.sourceType === 'performer') {
         // eslint-disable-next-line no-await-in-loop
         await this.performerService.updateVerificationStatus(verification.sourceId);
-        console.log('console 2');
       }
       // eslint-disable-next-line no-param-reassign
       verification.verified = true;
