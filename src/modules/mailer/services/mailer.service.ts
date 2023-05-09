@@ -175,7 +175,7 @@ export class MailerService {
         margin: 0 auto;
         width: 140px;
         border-radius: 30px;
-        }	
+        }
       @media only screen and (max-width:800px) {
         /* For tablets: */
         html {
@@ -200,7 +200,7 @@ export class MailerService {
         margin: 0 auto;
         width: 140px;
         border-radius: 30px;
-        }	
+        }
       }
       </style>
       </head>
@@ -219,9 +219,9 @@ export class MailerService {
           You are almost ready to start interacting with other users and another influencers. Please confirm your email address by clicking
           the link below.
         </p>
-        <span></span>	
+        <span></span>
         <a href="${verificationLink}" target="_blank">Yes, it's me</a>
-        <span></span>	
+        <span></span>
         <p style="font-size: 14px; margin-left: 45px; margin-right: 40px; margin-top: 30px;">
           By verifying your email address, you confirm your registration and that you are over 18 years of age. We will use
           this email address to keep you abreast of product updates, important information about your account, news and special offers.
