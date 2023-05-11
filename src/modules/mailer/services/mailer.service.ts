@@ -150,7 +150,7 @@ export class MailerService {
     // console.log('Link', verificationLink);
     // console.log('siteName', siteName);
     const mailOptions = {
-      from: 'hitceate@gmail.com',
+      from: 'privacy@myadultfan.com',
       to: email.to,
       subject: email.subject,
       html: `<!DOCTYPE html>
