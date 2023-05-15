@@ -167,7 +167,7 @@ export class MailerService {
       }
       a {
         background: #00B2FF;
-        padding:20px;
+        padding:15px;
         text-decoration: none;
         text-align: center;
         color: white;
@@ -179,8 +179,19 @@ export class MailerService {
       @media only screen and (max-width:800px) {
         /* For tablets: */
         html {
-          margin-left:10%;
-        margin-right:10%;
+          margin-left:0;
+        margin-right:0;
+        }
+        a {
+        background: #00B2FF;
+        padding:10px;
+        text-decoration: none;
+        text-align: center;
+        color: white;
+        display: block;
+        margin: 0 auto;
+        width: 140px;
+        border-radius: 30px;
         }
       }
       @media only screen and (max-width:500px) {
@@ -205,8 +216,8 @@ export class MailerService {
       </style>
       </head>
       <body style="font-family: Arial, Helvetica, sans-serif;">
-        <img src="https://myadultfan.com/logo.png" width="30%" height="42px" style="float: left; object-fit: contain;">
-        <div style="background-color: #00B2FF; width: 70%; height: 42px; float: left;"></div>
+        <img src="https://myadultfan.com/logo.png" width="35%" height="auto" style="margin-bottom: -15px; margin-top: -15px;">
+        
         <img src="https://myadultfan.com/img-email.jpg" width="100%" height="auto" >    
         <div style="background-color: #00B2FF; width: 100%; height: 42px;">
           <p style="color:white; text-align: center; margin: 0; padding-top: 14px; font-size: small;">
@@ -215,11 +226,10 @@ export class MailerService {
         </div>
         <h1 style="font-size: 18px; font-weight: 900; margin-left: 45px; margin-top: 30px;">Welcome to MyAdultFan</h1>
         <p style="font-size: 14px; margin-left: 45px; font-weight: 900">Hi there,</p>
-        <p style="font-size: 14px; margin-left: 45px; margin-right: 40px;">
+        <p style="font-size: 14px; margin-left: 45px; margin-right: 40px; margin-bottom: 25px;">
           You are almost ready to start interacting with other users and another influencers. Please confirm your email address by clicking
           the link below.
         </p>
-        <span></span>
         <a href="${verificationLink}" target="_blank">Yes, it's me</a>
         <span></span>
         <p style="font-size: 14px; margin-left: 45px; margin-right: 40px; margin-top: 30px;">
