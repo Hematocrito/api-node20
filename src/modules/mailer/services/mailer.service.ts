@@ -162,8 +162,8 @@ export class MailerService {
         box-sizing: border-box;
       }
       html{
-        margin-left: 20%;
-        margin-right: 20%;
+        margin-left: 0;
+        margin-right: 0;
       }
       a {
         background: #00B2FF;
