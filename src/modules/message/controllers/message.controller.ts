@@ -49,13 +49,13 @@ export class MessageController {
     // TODO - check and support multiple files!!!
     MultiFileUploadInterceptor([
       {
-        type: 'message-photo',
-        fieldName: 'message-photo',
-        options: {
-          destination: getConfig('file').imageDir
-        }
+      type: 'message-photo',
+      fieldName: 'message-photo',
+      options: {
+      destination: getConfig('file').imageDir
       }
-    ])
+      }
+      ])
   )
   async createPrivateFileMessage(
     @FilesUploaded() files: Record<string, any>,
@@ -139,7 +139,7 @@ export class MessageController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async deleteAllPublicMessage(
     @Param('conversationId') conversationId: string,
-    @CurrentUser() user: any
+    @CurrentUser() user: UserDto
   ): Promise<DataResponse<any>> {
     const data = await this.messageService.deleteAllMessageInConversation(
       conversationId,

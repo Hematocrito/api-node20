@@ -17,6 +17,7 @@ import { AuthGuard } from 'src/modules/auth/guards';
 import { toObjectId } from 'src/kernel/helpers/string.helper';
 import { CurrentUser } from 'src/modules/auth';
 import { CountryService } from 'src/modules/utils/services';
+import { UserDto } from 'src/modules/user/dtos';
 import { ConversationDto } from '../dtos';
 import { ConversationService } from '../services/conversation.service';
 import { ConversationCreatePayload, ConversationSearchPayload } from '../payloads';
@@ -61,9 +62,10 @@ export class ConversationController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   async getDetails(
-    @Param('id') conversationId: string
+    @Param('id') conversationId: string,
+    @CurrentUser() user: UserDto
   ): Promise<DataResponse<any>> {
-    const data = await this.conversationService.findById(conversationId);
+    const data = await this.conversationService.findById(conversationId, user);
     return DataResponse.ok(new ConversationDto(data));
   }
 

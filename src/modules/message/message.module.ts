@@ -16,27 +16,27 @@ import { UtilsModule } from '../utils/utils.module';
 
 @Module({
   imports: [
-    MongoDBModule,
-    QueueModule.forRoot(),
-    SocketModule,
-    forwardRef(() => UserModule),
-    forwardRef(() => PerformerModule),
-    forwardRef(() => AuthModule),
-    forwardRef(() => FileModule),
-    forwardRef(() => SubscriptionModule),
-    forwardRef(() => BlockModule),
-    forwardRef(() => UtilsModule)
+  MongoDBModule,
+  QueueModule.forRoot(),
+  SocketModule,
+  forwardRef(() => UserModule),
+  forwardRef(() => PerformerModule),
+  forwardRef(() => AuthModule),
+  forwardRef(() => FileModule),
+  forwardRef(() => SubscriptionModule),
+  forwardRef(() => BlockModule),
+  forwardRef(() => UtilsModule)
   ],
   providers: [
-    ...messageProviders,
-    ...conversationProviders,
-    ...notificationMessageProviders,
-    ConversationService,
-    MessageService,
-    NotificationMessageService,
-    MessageListener
+  ...messageProviders,
+  ...conversationProviders,
+  ...notificationMessageProviders,
+  ConversationService,
+  MessageService,
+  NotificationMessageService,
+  MessageListener
   ],
   controllers: [ConversationController, MessageController],
   exports: [ConversationService, MessageService]
-})
+  })
 export class MessageModule { }
