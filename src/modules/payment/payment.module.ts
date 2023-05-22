@@ -30,54 +30,58 @@ import {
 } from './controllers';
 import { OrderListener } from './listeners';
 import { VerotelService } from './services/verotel.service';
+import { AstropayPaymentsController } from './controllers/astropay-payments.controller';
+import { AstropayPaymentsService } from './services/astropay-payments.service';
 
 @Module({
   imports: [
-    MongoDBModule,
-    QueueModule.forRoot(),
-    HttpModule.register({
-      timeout: 10000,
-      maxRedirects: 5
+  MongoDBModule,
+  QueueModule.forRoot(),
+  HttpModule.register({
+    timeout: 10000,
+    maxRedirects: 5
     }),
-    // inject user module because we request guard from auth, need to check and fix dependencies if not needed later
-    forwardRef(() => UserModule),
-    forwardRef(() => AuthModule),
-    forwardRef(() => PerformerModule),
-    forwardRef(() => SettingModule),
-    forwardRef(() => SubscriptionModule),
-    forwardRef(() => PerformerAssetsModule),
-    forwardRef(() => CouponModule),
-    forwardRef(() => MailerModule),
-    forwardRef(() => WalletPackageModule),
-    forwardRef(() => MessageModule)
+// inject user module because we request guard from auth, need to check and fix dependencies if not needed later
+  forwardRef(() => UserModule),
+  forwardRef(() => AuthModule),
+  forwardRef(() => PerformerModule),
+  forwardRef(() => SettingModule),
+  forwardRef(() => SubscriptionModule),
+  forwardRef(() => PerformerAssetsModule),
+  forwardRef(() => CouponModule),
+  forwardRef(() => MailerModule),
+  forwardRef(() => WalletPackageModule),
+  forwardRef(() => MessageModule)
   ],
   providers: [
-    ...paymentProviders,
-    ...orderProviders,
-    PaymentService,
-    PaymentWalletService,
-    CCBillService,
-    CheckPaymentService,
-    OrderService,
-    OrderListener,
-    VerotelService
+  ...paymentProviders,
+  ...orderProviders,
+  PaymentService,
+  PaymentWalletService,
+  CCBillService,
+  CheckPaymentService,
+  OrderService,
+  OrderListener,
+  VerotelService,
+  AstropayPaymentsService
   ],
   controllers: [
-    PaymentController,
-    PaymentWalletController,
-    OrderController,
-    PaymentWebhookController,
-    AdminOrderController
+  PaymentController,
+  PaymentWalletController,
+  OrderController,
+  PaymentWebhookController,
+  AdminOrderController,
+  AstropayPaymentsController
   ],
   exports: [
-    ...paymentProviders,
-    ...orderProviders,
-    PaymentService,
-    CCBillService,
-    CheckPaymentService,
-    OrderService
+  ...paymentProviders,
+  ...orderProviders,
+  PaymentService,
+  CCBillService,
+  CheckPaymentService,
+  OrderService
   ]
-})
+  })
 export class PaymentModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
