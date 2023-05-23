@@ -134,7 +134,7 @@ export class MessageController {
 
   @Delete('/:conversationId/remove-all-message')
   @HttpCode(HttpStatus.OK)
-  @Roles('admin', 'performer')
+  @Roles('admin', 'performer', 'user')
   @UseGuards(RoleGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   async deleteAllPublicMessage(
