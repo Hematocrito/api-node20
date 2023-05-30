@@ -139,7 +139,7 @@ export class MessageController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async deleteAllPublicMessage(
     @Param('conversationId') conversationId: string,
-    @CurrentUser() user: any
+    @CurrentUser() user: UserDto
   ): Promise<DataResponse<any>> {
     const data = await this.messageService.deleteAllMessageInConversation(
       conversationId,

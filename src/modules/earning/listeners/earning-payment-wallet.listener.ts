@@ -1,4 +1,4 @@
-import { QueueEvent, QueueEventService } from 'src/kernel';
+import { EntityNotFoundException, QueueEvent, QueueEventService } from 'src/kernel';
 import { Injectable, Inject } from '@nestjs/common';
 import { UserService } from 'src/modules/user/services';
 import { Model } from 'mongoose';
@@ -153,11 +153,18 @@ export class EarningPaymentWalletListener {
         createdAt: new Date(),
         totalPrice: order.totalPrice.toFixed(2)
       });
+
       if (conversationId) {
-        const conversation = await this.conversationService.findById(
-          conversationId
+        let conversation = await this.conversationService.findById(
+          conversationId, user
         );
-        if (!conversationId) {
+
+        if (!conversation) {
+          conversation = await this.conversationService.findById(
+            conversationId, performer
+          );
+        }
+        if (!conversation) {
           return;
         }
 
@@ -169,6 +176,7 @@ export class EarningPaymentWalletListener {
           type: MESSAGE_TYPE.TIP
         };
         const roomName = conversation.getRoomName();
+        // FIXME: check this!
         await this.socketUserService.emitToRoom(
           roomName,
           `message_created_conversation_${conversation._id}`,
