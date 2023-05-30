@@ -49,13 +49,13 @@ export class MessageController {
     // TODO - check and support multiple files!!!
     MultiFileUploadInterceptor([
       {
-        type: 'message-photo',
-        fieldName: 'message-photo',
-        options: {
-          destination: getConfig('file').imageDir
-        }
+      type: 'message-photo',
+      fieldName: 'message-photo',
+      options: {
+      destination: getConfig('file').imageDir
       }
-    ])
+      }
+      ])
   )
   async createPrivateFileMessage(
     @FilesUploaded() files: Record<string, any>,
