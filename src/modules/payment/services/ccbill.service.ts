@@ -46,7 +46,8 @@ export class CCBillService {
     const formDigest = crypto.createHash('md5')
       .update(`${initialPrice}${initialPeriod}${initialPrice}${initialPeriod}99${currencyCode}${salt}`).digest('hex');
     return {
-      paymentUrl: `https://api.ccbill.com/wap-frontflex/flexforms/${flexformId}?transactionId=${transactionId}&initialPrice=${initialPrice}&initialPeriod=${initialPeriod}&recurringPrice=${initialPrice}&recurringPeriod=${initialPeriod}&numRebills=99&clientSubacc=${subAccountNumber}&currencyCode=${currencyCode}&formDigest=${formDigest}`
+      // paymentUrl: `https://api.ccbill.com/wap-frontflex/flexforms/${flexformId}?transactionId=${transactionId}&initialPrice=${initialPrice}&initialPeriod=${initialPeriod}&recurringPrice=${initialPrice}&recurringPeriod=${initialPeriod}&numRebills=99&clientSubacc=${subAccountNumber}&currencyCode=${currencyCode}&formDigest=${formDigest}`
+      paymentUrl: 'https://api.ccbill.com/wap-frontflex/flexforms/a4daf744-28b3-4fca-b427-fa87143745e1'
     };
   }
 

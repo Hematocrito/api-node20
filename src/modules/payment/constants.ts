@@ -6,7 +6,7 @@ export const PAYMENT_STATUS = {
 // eslint-disable-next-line no-shadow
 export enum PAYMENT_GATEWAY {
   CCBILL = 'ccbill',
-  VEROTEL = 'verotel',
+  ASTROPAY = 'astropay',
   WALLET = 'wallet'
 }
 export const PAYMENT_TYPE = {

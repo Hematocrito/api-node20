@@ -87,9 +87,7 @@ export class PaymentWalletService {
   }
 
   public async payPrivateChat(user: UserDto, conversationId) {
-    const conversation = await this.conversationService.findById(
-      conversationId
-    );
+    const conversation = await this.conversationService.findById(conversationId, user);
     if (!conversation) {
       throw new EntityNotFoundException();
     }

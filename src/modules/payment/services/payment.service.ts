@@ -96,7 +96,7 @@ export class PaymentService {
     order: OrderModel,
     paymentGateway = 'ccbill'
   ) {
-    if (paymentGateway === 'verotel') {
+    if (paymentGateway === 'astropay') {
       const transaction = await this.paymentTransactionModel.create({
         paymentGateway,
         orderId: order._id,
@@ -104,7 +104,6 @@ export class PaymentService {
         sourceId: order.buyerId,
         type: order.type,
         totalPrice: order.totalPrice,
-        products: [],
         status: PAYMENT_STATUS.PENDING
       });
       const orderDetails = await this.orderService.getDetails(order._id);

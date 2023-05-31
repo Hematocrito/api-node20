@@ -42,8 +42,10 @@ export class PaymentController {
     @Body() payload: SubscribePerformerPayload
   ): Promise<DataResponse<any>> {
     const order = await this.orderService.createForPerformerSubscription(payload, user);
+    console.log('Order ', order);
     const info = await this.paymentService.subscribePerformer(order, payload.paymentGateway || 'ccbill');
     return DataResponse.ok(info);
+    // return DataResponse.ok(order);
   }
 
   /**
