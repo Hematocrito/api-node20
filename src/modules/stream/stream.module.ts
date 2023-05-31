@@ -16,6 +16,7 @@ import { StreamConversationWsGateway, PrivateStreamWsGateway, PublicStreamWsGate
 import { StreamMessageListener, StreamConnectListener } from './listeners';
 import { SettingModule } from '../settings/setting.module';
 import { PerformerDisconnectListener } from './listeners/performer-disconnect.listener';
+import { ConversationService } from '../message/services';
 
 const agent = new https.Agent({
   rejectUnauthorized: process.env.REJECT_UNAUTHORIZED !== 'false'
@@ -23,41 +24,41 @@ const agent = new https.Agent({
 
 @Module({
   imports: [
-    MongoDBModule,
-    HttpModule.register({
-      timeout: 10000,
-      maxRedirects: 5,
-      httpsAgent: agent
+  MongoDBModule,
+  HttpModule.register({
+    timeout: 10000,
+    maxRedirects: 5,
+    httpsAgent: agent
     }),
-    QueueModule.forRoot(),
-    // https://github.com/kyknow/nestjs-redis
-    RedisModule.forRootAsync({
-      // TODO - load config for redis socket
-      useFactory: (configService: ConfigService) => configService.get('redis'),
-      // useFactory: async (configService: ConfigService) => configService.get('redis'),
-      inject: [ConfigService]
+  QueueModule.forRoot(),
+// https://github.com/kyknow/nestjs-redis
+  RedisModule.forRootAsync({
+// TODO - load config for redis socket
+    useFactory: (configService: ConfigService) => configService.get('redis'),
+// useFactory: async (configService: ConfigService) => configService.get('redis'),
+    inject: [ConfigService]
     }),
-    UserModule,
-    SubscriptionModule,
-    MessageModule,
-    forwardRef(() => SocketModule),
-    forwardRef(() => AuthModule),
-    forwardRef(() => PerformerModule),
-    forwardRef(() => MessageModule),
-    forwardRef(() => SettingModule)
+  UserModule,
+  SubscriptionModule,
+  MessageModule,
+  forwardRef(() => SocketModule),
+  forwardRef(() => AuthModule),
+  forwardRef(() => PerformerModule),
+  forwardRef(() => MessageModule),
+  forwardRef(() => SettingModule)
   ],
   providers: [
-    ...assetsProviders,
-    StreamService,
-    RequestService,
-    StreamMessageListener,
-    StreamConnectListener,
-    StreamConversationWsGateway,
-    PrivateStreamWsGateway,
-    PublicStreamWsGateway,
-    PerformerDisconnectListener
+  ...assetsProviders,
+  StreamService,
+  RequestService,
+  StreamMessageListener,
+  StreamConnectListener,
+  StreamConversationWsGateway,
+  PrivateStreamWsGateway,
+  PublicStreamWsGateway,
+  PerformerDisconnectListener
   ],
   controllers: [StreamController],
   exports: [StreamService]
-})
+  })
 export class StreamModule {}

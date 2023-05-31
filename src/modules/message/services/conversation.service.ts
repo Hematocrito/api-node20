@@ -319,6 +319,33 @@ export class ConversationService {
     return new UserConversationDto(userConversation);
   }
 
+  public async findById2(id: string | ObjectId) {
+    let conversation : any;
+
+    conversation = await this.performerConversationModel
+      .findOne({
+        _id: id
+      })
+      .lean()
+      .exec();
+
+    if (!conversation) {
+      conversation = await this.userConversationModel
+        .findOne({
+          _id: id
+        })
+        .lean()
+        .exec();
+      if (conversation) {
+        return new UserConversationDto(conversation);
+      }
+    } else {
+      return new PerformerConversationDto(conversation);
+    }
+
+    return undefined;
+  }
+
   public async addRecipient(
     conversationId: string | ObjectId,
     recipient: IRecipient

@@ -10,6 +10,7 @@ import { UserDto } from 'src/modules/user/dtos';
 import { PerformerService } from 'src/modules/performer/services';
 import * as moment from 'moment';
 import { ConversationService } from 'src/modules/message/services';
+import { PerformerDto } from 'src/modules/performer/dtos';
 import { BroadcastStatus } from '../constant';
 import { StreamModel } from '../models';
 import { STREAM_MODEL_PROVIDER } from '../providers/stream.provider';
@@ -49,9 +50,20 @@ export class PrivateStreamWsGateway {
         return;
       }
 
+      const decodded1 = token && (await this.authService.verifyJWT(token));
+      let user1: any;
+      if (decodded1 && decodded1.source === 'user') {
+        user1 = await this.userService.findById(decodded1.sourceId);
+        user1 = new UserDto(user1);
+      }
+      if (decodded1 && decodded1.source === 'performer') {
+        user1 = await this.performerService.findById(decodded1.sourceId);
+        user1 = new PerformerDto(user1);
+      }
+
       const [user, conversation] = await Promise.all([
         this.authService.getSourceFromJWT(token),
-        this.conversationService.findById(conversationId)
+        this.conversationService.findById(conversationId, user1)
       ]);
 
       if (!user || !conversation) {
@@ -134,9 +146,20 @@ export class PrivateStreamWsGateway {
         return;
       }
 
+      const decodded1 = token && (await this.authService.verifyJWT(token));
+      let user1: any;
+      if (decodded1 && decodded1.source === 'user') {
+        user1 = await this.userService.findById(decodded1.sourceId);
+        user1 = new UserDto(user1);
+      }
+      if (decodded1 && decodded1.source === 'performer') {
+        user1 = await this.performerService.findById(decodded1.sourceId);
+        user1 = new PerformerDto(user1);
+      }
+
       const [user, conversation] = await Promise.all([
         this.authService.getSourceFromJWT(token),
-        this.conversationService.findById(conversationId)
+        this.conversationService.findById(conversationId, user1)
       ]);
 
       if (!user || !conversation) {
