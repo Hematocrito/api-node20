@@ -36,43 +36,43 @@ import { NotifcationModule } from './modules/notification/notifcation.module';
 
 @Module({
   imports: [
-    ConfigModule.resolveRootPath(__dirname).load('config/**/!(*.d).{ts,js}'),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public')
+  ConfigModule.resolveRootPath(__dirname).load('config/**/!(*.d).{ts,js}'),
+  ServeStaticModule.forRoot({
+    rootPath: join(__dirname, '..', 'public')
     }),
-    AuthModule,
-    UserModule,
-    PostModule,
-    SettingModule,
-    MailerModule,
-    FileModule,
-    UtilsModule,
-    PerformerModule,
-    PerformerAssetsModule,
-    CommentModule,
-    ReactionModule,
-    PaymentModule,
-    SubscriptionModule,
-    BannerModule,
-    SocketModule,
-    MessageModule,
-    CouponModule,
-    StreamModule,
-    WalletPackageModule,
-    ContactModule,
-    StatisticModule,
-    FeedModule,
-    PerformerStoryModule,
-    PayoutRequestModule,
-    BlockModule,
-    SearchModule,
-    CategoryModule,
-    ReportModule,
-    NotifcationModule
+  AuthModule,
+  UserModule,
+  PostModule,
+  SettingModule,
+  MailerModule,
+  FileModule,
+  UtilsModule,
+  PerformerModule,
+  PerformerAssetsModule,
+  CommentModule,
+  ReactionModule,
+  PaymentModule,
+  SubscriptionModule,
+  BannerModule,
+  SocketModule,
+  MessageModule,
+  CouponModule,
+  StreamModule,
+  WalletPackageModule,
+  ContactModule,
+  StatisticModule,
+  FeedModule,
+  PerformerStoryModule,
+  PayoutRequestModule,
+  BlockModule,
+  SearchModule,
+  CategoryModule,
+  ReportModule,
+  NotifcationModule
   ],
   controllers: [AppController],
   providers: [AppService]
-})
+  })
 export class AppModule {}
 
 export default AppModule;
