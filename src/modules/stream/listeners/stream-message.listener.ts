@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { QueueEvent, QueueEventService } from 'src/kernel';
 import { SocketUserService } from 'src/modules/socket/services/socket-user.service';
 import { MESSAGE_PRIVATE_STREAM_CHANNEL, MESSAGE_EVENT } from 'src/modules/message/constants';
-import { MessageDto, ConversationDto } from 'src/modules/message/dtos';
+import {
+  MessageDto, ConversationDto, PerformerConversationDto, UserConversationDto
+} from 'src/modules/message/dtos';
 import { ConversationService } from 'src/modules/message/services';
+import { Model } from 'mongoose';
+import { UserConversationModel, PerformerConversationModel } from 'src/modules/message/models';
+import { CONVERSATION_USERS_MODEL_PROVIDER, CONVERSATION_PERFORMERS_MODEL_PROVIDER } from 'src/modules/message/providers';
 
 const MESSAGE_STREAM_NOTIFY = 'MESSAGE_STREAM_NOTIFY';
 
@@ -25,7 +30,7 @@ export class StreamMessageListener {
     if (![MESSAGE_EVENT.CREATED, MESSAGE_EVENT.DELETED].includes(event.eventName)) return;
     const message = event.data as MessageDto;
 
-    const conversation = await this.conversationService.findById(message.conversationId);
+    const conversation = await this.conversationService.findById2(message.conversationId);
     if (!conversation) return;
     if (event.eventName === MESSAGE_EVENT.CREATED) {
       await this.handleNotify(conversation, message);

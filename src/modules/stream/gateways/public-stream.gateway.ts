@@ -40,16 +40,19 @@ export class PublicStreamWsGateway {
         return;
       }
 
-      const conversation = await this.conversationService.findById(
-        conversationId
-      );
-      if (!conversation) return;
-
       const { token } = client.handshake.query;
       if (!token) return;
 
       const user = await this.authService.getSourceFromJWT(token);
       if (!user) return;
+
+      const conversation = await this.conversationService.findById(
+        conversationId, new UserDto(user)
+      );
+      if (!conversation) return;
+
+      // const { token } = client.handshake.query;
+      // if (!token) return;
 
       const roomName = conversation.getRoomName();
       this.socketService.emitToRoom(roomName, 'join-broadcaster', {
@@ -90,8 +93,18 @@ export class PublicStreamWsGateway {
       if (!conversationId) {
         return;
       }
+
+      const decodded1 = token && (await this.authService.verifyJWT(token));
+      let user1: any;
+      if (decodded1 && decodded1.source === 'user') {
+        user1 = await this.userService.findById(decodded1.sourceId);
+      }
+      if (decodded1 && decodded1.source === 'performer') {
+        user1 = await this.performerService.findById(decodded1.sourceId);
+      }
+
       const conversation = conversationId
-        && (await this.conversationService.findById(conversationId));
+        && (await this.conversationService.findById(conversationId, new UserDto(user1)));
       if (!conversation) {
         return;
       }
@@ -185,8 +198,13 @@ export class PublicStreamWsGateway {
       if (!conversationId) {
         return;
       }
+
+      const [user1] = await Promise.all([
+        token && this.authService.getSourceFromJWT(token)
+      ]);
+
       const conversation = payload.conversationId
-        && (await this.conversationService.findById(conversationId));
+        && (await this.conversationService.findById(conversationId, new UserDto(user1)));
       if (!conversation) {
         return;
       }
