@@ -298,7 +298,7 @@ export class ConversationService {
     };
   }
 
-  public async findById(id: string | ObjectId/* , user: UserDto | PerformerDto */) {
+  public async findById(id: string | ObjectId, user: UserDto | PerformerDto) {
     if (!user.isPerformer) {
       const performerConversation = await this.performerConversationModel
         .findOne({

@@ -33,6 +33,7 @@ interface ICCBillCancelSubscription {
 @Injectable()
 export class CCBillService {
   public subscription(options: CCBillSubscription) {
+    console.log('Inicio ');
     const { transactionId } = options;
     const { salt } = options;
     const { flexformId } = options;
@@ -40,11 +41,11 @@ export class CCBillService {
     const initialPrice = options.price.toFixed(2);
     const initialPeriod = (options.subscriptionType === SUBSCRIPTION_TYPE.MONTHLY || options.subscriptionType === 'monthly_subscription') ? 30 : 365;
     const currencyCode = '840'; // usd
-    if (!salt || !flexformId || !subAccountNumber || !transactionId || !initialPrice) {
+    /* if (!salt || !flexformId || !subAccountNumber || !transactionId || !initialPrice) {
       throw new EntityNotFoundException();
     }
     const formDigest = crypto.createHash('md5')
-      .update(`${initialPrice}${initialPeriod}${initialPrice}${initialPeriod}99${currencyCode}${salt}`).digest('hex');
+      .update(`${initialPrice}${initialPeriod}${initialPrice}${initialPeriod}99${currencyCode}${salt}`).digest('hex'); */
     return {
       // paymentUrl: `https://api.ccbill.com/wap-frontflex/flexforms/${flexformId}?transactionId=${transactionId}&initialPrice=${initialPrice}&initialPeriod=${initialPeriod}&recurringPrice=${initialPrice}&recurringPeriod=${initialPeriod}&numRebills=99&clientSubacc=${subAccountNumber}&currencyCode=${currencyCode}&formDigest=${formDigest}`
       paymentUrl: 'https://api.ccbill.com/wap-frontflex/flexforms/a4daf744-28b3-4fca-b427-fa87143745e1'

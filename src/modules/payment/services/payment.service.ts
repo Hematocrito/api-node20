@@ -79,12 +79,13 @@ export class PaymentService {
       performerId,
       paymentGateway
     );
+    console.log('Performer ', performerPaymentSetting);
     const flexformId = performerPaymentSetting?.value?.flexformId;
     const subAccountNumber = performerPaymentSetting?.value?.subscriptionSubAccountNumber;
     const salt = performerPaymentSetting?.value?.salt;
-    if (!performerPaymentSetting || !flexformId || !subAccountNumber || !salt) {
+    /* if (!performerPaymentSetting || !flexformId || !subAccountNumber || !salt) {
       throw new MissingConfigPaymentException();
-    }
+    } */
     return {
       flexformId,
       subAccountNumber,
@@ -126,7 +127,6 @@ export class PaymentService {
         subAccountNumber,
         salt
       } = await this.getPerformerSubscroptionPaymentGatewaySetting(order.sellerId);
-
       const transaction = await this.paymentTransactionModel.create({
         paymentGateway,
         orderId: order._id,
