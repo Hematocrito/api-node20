@@ -119,6 +119,7 @@ export class PaymentController {
     @Body() payload: PurchaseTokenCustomAmountPayload
   ): Promise<DataResponse<any>> {
     const order = await this.orderService.createForCustomWalletAmount(payload, user);
+    console.log('Order ', order);
     const info = await this.paymentService.purchaseWalletPackage(order, payload.paymentGateway || 'ccbill');
     return DataResponse.ok(info);
   }

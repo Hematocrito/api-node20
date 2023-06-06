@@ -305,9 +305,9 @@ export class PaymentService {
         this.settingService.getKeyValue(SETTING_KEYS.CCBILL_SALT),
         this.settingService.getKeyValue(SETTING_KEYS.CCBILL_CURRENCY_CODE)
       ]);
-      if (!flexformId || !subAccountNumber || !salt) {
+      /* if (!flexformId || !subAccountNumber || !salt) {
         throw new MissingConfigPaymentException();
-      }
+      } */
 
       const transaction = await this.paymentTransactionModel.create({
         paymentGateway,

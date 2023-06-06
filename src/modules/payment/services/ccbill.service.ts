@@ -60,9 +60,9 @@ export class CCBillService {
     const initialPrice = options.price.toFixed(2);
     const currencyCode = options.currencyCode || '840';
     const initialPeriod = 30;
-    if (!salt || !flexformId || !subAccountNumber || !transactionId || !initialPrice) {
+    /* if (!salt || !flexformId || !subAccountNumber || !transactionId || !initialPrice) {
       throw new EntityNotFoundException();
-    }
+    } */
     const formDigest = crypto.createHash('md5')
       .update(`${initialPrice}${initialPeriod}${currencyCode}${salt}`)
       .digest('hex');
