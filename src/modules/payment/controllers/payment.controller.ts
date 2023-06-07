@@ -7,7 +7,8 @@ import {
   ValidationPipe,
   UseGuards,
   Post,
-  Body
+  Body,
+  Param
 } from '@nestjs/common';
 import { RoleGuard } from 'src/modules/auth/guards';
 import { DataResponse } from 'src/kernel';
@@ -18,7 +19,8 @@ import {
   PurchaseProductsPayload,
   PurchaseVideoPayload,
   PurchaseSinglePhotoPayload,
-  PurchaseTokenCustomAmountPayload
+  PurchaseTokenCustomAmountPayload,
+  PurchaseFeedPayload
 } from '../payloads';
 import { UserDto } from '../../user/dtos';
 import { PaymentService } from '../services/payment.service';
@@ -119,8 +121,24 @@ export class PaymentController {
     @Body() payload: PurchaseTokenCustomAmountPayload
   ): Promise<DataResponse<any>> {
     const order = await this.orderService.createForCustomWalletAmount(payload, user);
-    console.log('Order ', order);
     const info = await this.paymentService.purchaseWalletPackage(order, payload.paymentGateway || 'ccbill');
+    return DataResponse.ok(info);
+  }
+
+  @Post('/purchase-feed/:id')
+  @HttpCode(HttpStatus.OK)
+  @Roles('user')
+  @UseGuards(RoleGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async purchaseFeed(
+    @CurrentUser() user: UserDto,
+    @Param('id') feedId: string,
+    @Body() payload: PurchaseFeedPayload
+  ): Promise<DataResponse<any>> {
+    // eslint-disable-next-line no-param-reassign
+    payload.feedId = feedId;
+    const order = await this.orderService.createFromPerformerFeed(payload, user);
+    const info = await this.paymentService.purchasePerformerFeed(order);
     return DataResponse.ok(info);
   }
 }

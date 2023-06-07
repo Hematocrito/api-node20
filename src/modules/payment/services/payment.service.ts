@@ -17,7 +17,7 @@ import { SettingService } from 'src/modules/settings';
 import { PAYMENT_TRANSACTION_MODEL_PROVIDER } from '../providers';
 import { OrderModel, PaymentTransactionModel } from '../models';
 import {
-  PAYMENT_STATUS, TRANSACTION_SUCCESS_CHANNEL
+  PAYMENT_STATUS, TRANSACTION_SUCCESS_CHANNEL, PAYMENT_TYPE
 } from '../constants';
 import { SubscriptionService } from '../../subscription/services/subscription.service';
 import { CCBillService } from './ccbill.service';
@@ -59,10 +59,10 @@ export class PaymentService {
     const flexformId = performerPaymentSetting?.value?.flexformId;
     const subAccountNumber = performerPaymentSetting?.value?.singlePurchaseSubAccountNumber;
     const salt = performerPaymentSetting?.value?.salt;
-
+    /*
     if (!performerPaymentSetting || !flexformId || !subAccountNumber || !salt) {
       throw new MissingConfigPaymentException();
-    }
+    } */
 
     return {
       flexformId,
@@ -79,7 +79,6 @@ export class PaymentService {
       performerId,
       paymentGateway
     );
-    console.log('Performer ', performerPaymentSetting);
     const flexformId = performerPaymentSetting?.value?.flexformId;
     const subAccountNumber = performerPaymentSetting?.value?.subscriptionSubAccountNumber;
     const salt = performerPaymentSetting?.value?.salt;
@@ -95,7 +94,7 @@ export class PaymentService {
 
   public async subscribePerformer(
     order: OrderModel,
-    paymentGateway = 'ccbill'
+    paymentGateway
   ) {
     if (paymentGateway === 'astropay') {
       const transaction = await this.paymentTransactionModel.create({
@@ -209,9 +208,35 @@ export class PaymentService {
     throw new MissingConfigPaymentException();
   }
 
+  public async purchasePerformerFeed(order: OrderModel, paymentGateway = 'ccbill') {
+    const {
+      flexformId,
+      subAccountNumber,
+      salt
+    } = await this.getPerformerSinglePaymentGatewaySetting(order.sellerId);
+
+    const transaction = await this.paymentTransactionModel.create({
+      paymentGateway,
+      orderId: order._id,
+      source: order.buyerSource,
+      sourceId: order.buyerId,
+      type: PAYMENT_TYPE.FEED,
+      totalPrice: order.totalPrice,
+      status: PAYMENT_STATUS.PENDING,
+      products: []
+    });
+    return this.ccbillService.singlePurchase({
+      salt,
+      flexformId,
+      subAccountNumber,
+      price: order.totalPrice,
+      transactionId: transaction._id
+    });
+  }
+
   public async purchasePerformerVOD(
     order: OrderModel,
-    paymentGateway = 'ccbill'
+    paymentGateway
   ) {
     if (paymentGateway === 'verotel') {
       const transaction = await this.paymentTransactionModel.create({
@@ -268,7 +293,7 @@ export class PaymentService {
     throw new MissingConfigPaymentException();
   }
 
-  public async purchaseWalletPackage(order: OrderModel, paymentGateway = 'ccbill') {
+  public async purchaseWalletPackage(order: OrderModel, paymentGateway) {
     if (paymentGateway === 'verotel') {
       const transaction = await this.paymentTransactionModel.create({
         paymentGateway,
@@ -480,7 +505,7 @@ export class PaymentService {
 
   public async purchasePerformerSinglePhoto(
     order: OrderModel,
-    paymentGateway = 'ccbill'
+    paymentGateway
   ) {
     if (paymentGateway === 'verotel') {
       const transaction = await this.paymentTransactionModel.create({

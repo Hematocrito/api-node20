@@ -32,6 +32,7 @@ import { OrderListener } from './listeners';
 import { VerotelService } from './services/verotel.service';
 import { AstropayPaymentsController } from './controllers/astropay-payments.controller';
 import { AstropayPaymentsService } from './services/astropay-payments.service';
+import { FeedModule } from '../feed/feed.module';
 
 @Module({
   imports: [
@@ -51,7 +52,8 @@ import { AstropayPaymentsService } from './services/astropay-payments.service';
   forwardRef(() => CouponModule),
   forwardRef(() => MailerModule),
   forwardRef(() => WalletPackageModule),
-  forwardRef(() => MessageModule)
+  forwardRef(() => MessageModule),
+  forwardRef(() => FeedModule)
   ],
   providers: [
   ...paymentProviders,

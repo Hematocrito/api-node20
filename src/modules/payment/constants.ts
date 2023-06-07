@@ -13,6 +13,7 @@ export const PAYMENT_TYPE = {
   MONTHLY_SUBSCRIPTION: 'monthly_subscription',
   YEARLY_SUBSCRIPTION: 'yearly_subscription',
   SALE_VIDEO: 'sale_video',
+  FEED: 'feed',
   PRODUCT: 'product',
   PERFORMER_PRODUCT: 'performer_product',
   SALE_PHOTO: 'sale_photo',

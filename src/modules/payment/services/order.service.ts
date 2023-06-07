@@ -6,6 +6,7 @@ import {
   ForbiddenException
 } from '@nestjs/common';
 import { PerformerService } from 'src/modules/performer/services';
+import { FeedService } from 'src/modules/feed/services';
 import {
   ProductService,
   VideoService,
@@ -39,6 +40,7 @@ import {
   PurchaseSinglePhotoPayload,
   PurchaseTokenCustomAmountPayload
 } from '../payloads';
+import { PurchaseFeedPayload } from '../payloads/purchase-feed.payload';
 import {
   DELIVERY_STATUS,
   ORDER_STATUS,
@@ -53,6 +55,8 @@ import { DifferentPerformerException } from '../exceptions';
 @Injectable()
 export class OrderService {
   constructor(
+    @Inject(forwardRef(() => FeedService))
+    private readonly feedService: FeedService,
     @Inject(forwardRef(() => PerformerService))
     private readonly performerService: PerformerService,
     @Inject(forwardRef(() => ProductService))
@@ -489,6 +493,70 @@ export class OrderService {
       })
     );
 
+    return order;
+  }
+
+  public async createFromPerformerFeed(payload: PurchaseFeedPayload, user: UserDto, buyerSource = 'user', orderStatus = ORDER_STATUS.CREATED) {
+    const feed = await this.feedService.findById(payload.feedId);
+    if (!feed?.isSale || !feed?.price) {
+      throw new EntityNotFoundException();
+    }
+    const { fromSourceId: performerId } = feed;
+    const performer = await this.performerService.findById(performerId);
+    if (!performer) {
+      throw new EntityNotFoundException();
+    }
+
+    const totalQuantity = 1;
+    const originalPrice = feed.price;
+    let coupon = null;
+    if (payload.couponCode) {
+      coupon = await this.couponService.applyCoupon(
+        payload.couponCode,
+        user._id
+      );
+    }
+    const productPrice = coupon
+      ? parseFloat((originalPrice - (originalPrice * coupon.value) as any)).toFixed(2)
+      : originalPrice;
+
+    const order = await this.orderModel.create({
+      buyerId: user._id,
+      buyerSource,
+      sellerId: performerId,
+      sellerSource: 'performer',
+      type: PAYMENT_TYPE.FEED,
+      orderNumber: this.generateOrderNumber(),
+      postalCode: '',
+      quantity: totalQuantity,
+      originalPrice,
+      totalPrice: productPrice,
+      couponInfo: coupon,
+      status: orderStatus,
+      deliveryAddress: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    await this.orderDetailModel.create({
+      orderId: order._id,
+      orderNumber: `${order.orderNumber}-S1`,
+      buyerId: user._id,
+      buyerSource: 'user',
+      sellerId: performerId,
+      sellerSource: 'performer',
+      name: `Purchase ${performer?.name || performer?.username || 'N/A'} post`,
+      description: feed.text,
+      unitPrice: feed.price,
+      originalPrice,
+      totalPrice: productPrice,
+      productType: PRODUCT_TYPE.FEED,
+      productId: feed._id,
+      quantity: 1,
+      payBy: 'money', // default!!
+      deliveryStatus: DELIVERY_STATUS.CREATED,
+      couponInfo: coupon
+    });
     return order;
   }
 

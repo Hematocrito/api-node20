@@ -33,7 +33,6 @@ interface ICCBillCancelSubscription {
 @Injectable()
 export class CCBillService {
   public subscription(options: CCBillSubscription) {
-    console.log('Inicio ');
     const { transactionId } = options;
     const { salt } = options;
     const { flexformId } = options;
