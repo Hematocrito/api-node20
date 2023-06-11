@@ -5,12 +5,8 @@ import { SocketUserService } from 'src/modules/socket/services/socket-user.servi
 import { ObjectId } from 'mongodb';
 import { MESSAGE_CHANNEL, MESSAGE_EVENT } from '../constants';
 import { MessageDto } from '../dtos';
-import {
-  CONVERSATION_MODEL_PROVIDER, CONVERSATION_PERFORMERS_MODEL_PROVIDER, CONVERSATION_USERS_MODEL_PROVIDER, NOTIFICATION_MESSAGE_MODEL_PROVIDER
-} from '../providers';
-import {
-  ConversationModel, UserConversationModel, NotificationMessageModel, PerformerConversationModel
-} from '../models';
+import { CONVERSATION_MODEL_PROVIDER, NOTIFICATION_MESSAGE_MODEL_PROVIDER } from '../providers';
+import { ConversationModel, NotificationMessageModel } from '../models';
 
 const MESSAGE_NOTIFY = 'MESSAGE_NOTIFY';
 const HANDLE_DELETE_MESSAGE = 'HANDLE_DELETE_MESSAGE';
@@ -22,10 +18,6 @@ export class MessageListener {
     private readonly socketUserService: SocketUserService,
     @Inject(CONVERSATION_MODEL_PROVIDER)
     private readonly conversationModel: Model<ConversationModel>,
-    @Inject(CONVERSATION_USERS_MODEL_PROVIDER)
-    private readonly userConversationModel: Model<UserConversationModel>,
-    @Inject(CONVERSATION_PERFORMERS_MODEL_PROVIDER)
-    private readonly performerConversationModel: Model<PerformerConversationModel>,
     @Inject(NOTIFICATION_MESSAGE_MODEL_PROVIDER)
     private readonly NotificationModel: Model<NotificationMessageModel>
   ) {

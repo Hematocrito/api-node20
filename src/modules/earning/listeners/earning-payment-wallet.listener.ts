@@ -153,18 +153,11 @@ export class EarningPaymentWalletListener {
         createdAt: new Date(),
         totalPrice: order.totalPrice.toFixed(2)
       });
-
       if (conversationId) {
-        let conversation = await this.conversationService.findById(
-          conversationId, user
+        const conversation = await this.conversationService.findById(
+          conversationId
         );
-
-        if (!conversation) {
-          conversation = await this.conversationService.findById(
-            conversationId, performer
-          );
-        }
-        if (!conversation) {
+        if (!conversationId) {
           return;
         }
 
@@ -176,7 +169,6 @@ export class EarningPaymentWalletListener {
           type: MESSAGE_TYPE.TIP
         };
         const roomName = conversation.getRoomName();
-        // FIXME: check this!
         await this.socketUserService.emitToRoom(
           roomName,
           `message_created_conversation_${conversation._id}`,
