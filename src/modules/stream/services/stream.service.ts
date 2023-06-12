@@ -14,7 +14,6 @@ import { ConversationService } from 'src/modules/message/services';
 import { SubscriptionService } from 'src/modules/subscription/services/subscription.service';
 import { UserDto } from 'src/modules/user/dtos';
 import { RedisService } from 'nestjs-redis';
-import { PerformerDto } from 'src/modules/performer/dtos';
 import { RequestService } from './request.service';
 import { SocketUserService } from '../../socket/services/socket-user.service';
 import {
@@ -214,9 +213,7 @@ export class StreamService {
   }
 
   public async accpetPrivateChat(id: string, performerId: ObjectId) {
-    const performer = await this.performerService.findById(performerId);
-
-    const conversation = await this.conversationService.findById(id, new PerformerDto(performer));
+    const conversation = await this.conversationService.findById(id);
     if (!conversation) {
       throw new EntityNotFoundException();
     }

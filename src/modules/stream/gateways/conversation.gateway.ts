@@ -53,18 +53,9 @@ export class StreamConversationWsGateway {
         return;
       }
 
-      const decodded1 = token && (await this.authService.verifyJWT(token));
-      let user1: any;
-      if (decodded1 && decodded1.source === 'user') {
-        user1 = await this.userService.findById(decodded1.sourceId);
-      }
-      if (decodded1 && decodded1.source === 'performer') {
-        user1 = await this.performerService.findById(decodded1.sourceId);
-      }
-
       const [user, conversation] = await Promise.all([
         this.authService.getSourceFromJWT(token),
-        this.conversationService.findById(conversationId, new UserDto(user1))
+        this.conversationService.findById(conversationId)
       ]);
 
       if (!user || !conversation) {
@@ -171,18 +162,9 @@ export class StreamConversationWsGateway {
         return;
       }
 
-      const decodded1 = token && (await this.authService.verifyJWT(token));
-      let user1: any;
-      if (decodded1 && decodded1.source === 'user') {
-        user1 = await this.userService.findById(decodded1.sourceId);
-      }
-      if (decodded1 && decodded1.source === 'performer') {
-        user1 = await this.performerService.findById(decodded1.sourceId);
-      }
-
       const [user, conversation] = await Promise.all([
         this.authService.getSourceFromJWT(token),
-        this.conversationService.findById(payload.conversationId, new UserDto(user1))
+        this.conversationService.findById(payload.conversationId)
       ]);
       if (!user || !conversation) {
         return;

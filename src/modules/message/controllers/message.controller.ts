@@ -134,12 +134,12 @@ export class MessageController {
 
   @Delete('/:conversationId/remove-all-message')
   @HttpCode(HttpStatus.OK)
-  @Roles('admin', 'performer', 'user')
+  @Roles('admin', 'performer')
   @UseGuards(RoleGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   async deleteAllPublicMessage(
     @Param('conversationId') conversationId: string,
-    @CurrentUser() user: UserDto
+    @CurrentUser() user: any
   ): Promise<DataResponse<any>> {
     const data = await this.messageService.deleteAllMessageInConversation(
       conversationId,

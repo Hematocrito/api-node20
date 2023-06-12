@@ -14,13 +14,11 @@ import { UserSearchRequestPayload } from 'src/modules/user/payloads';
 import { EntityNotFoundException } from 'src/kernel';
 import { PerformerBlockService } from 'src/modules/block/services';
 import { ConversationSearchPayload } from '../payloads';
-import { ConversationDto, PerformerConversationDto, UserConversationDto } from '../dtos';
+import { ConversationDto } from '../dtos';
 import { CONVERSATION_TYPE } from '../constants';
+import { ConversationModel, NotificationMessageModel } from '../models';
 import {
-  ConversationModel, NotificationMessageModel, PerformerConversationModel, UserConversationModel
-} from '../models';
-import {
-  CONVERSATION_MODEL_PROVIDER, CONVERSATION_PERFORMERS_MODEL_PROVIDER, CONVERSATION_USERS_MODEL_PROVIDER, NOTIFICATION_MESSAGE_MODEL_PROVIDER
+  CONVERSATION_MODEL_PROVIDER, NOTIFICATION_MESSAGE_MODEL_PROVIDER
 } from '../providers';
 
 export interface IRecipient {
@@ -33,10 +31,6 @@ export class ConversationService {
   constructor(
     @Inject(CONVERSATION_MODEL_PROVIDER)
     private readonly conversationModel: Model<ConversationModel>,
-    @Inject(CONVERSATION_USERS_MODEL_PROVIDER)
-    private readonly userConversationModel: Model<UserConversationModel>,
-    @Inject(CONVERSATION_PERFORMERS_MODEL_PROVIDER)
-    private readonly performerConversationModel: Model<PerformerConversationModel>,
     private readonly userService: UserService,
     private readonly userSearchService: UserSearchService,
     private readonly performerService: PerformerService,
@@ -67,8 +61,8 @@ export class ConversationService {
     sender: IRecipient,
     receiver: IRecipient
   ): Promise<ConversationDto> {
-    if (sender.source === 'user') {
-      let userConversation = await this.userConversationModel.findOne({
+    let conversation = await this.conversationModel
+      .findOne({
         type: CONVERSATION_TYPE.PRIVATE,
         recipients: {
           $all: [
@@ -82,57 +76,11 @@ export class ConversationService {
             }
           ]
         }
-      });
-
-      if (!userConversation) {
-        userConversation = await this.userConversationModel.create({
-          type: CONVERSATION_TYPE.PRIVATE,
-          recipients: [sender, receiver],
-          createdAt: new Date(),
-          updatedAt: new Date()
-        });
-      }
-
-      // TODO - define DTO?
-      const dto = new UserConversationDto(userConversation);
-      dto.totalNotSeenMessages = 0;
-      if (receiver.source === 'performer') {
-        const per = await this.performerService.findById(receiver.sourceId);
-        if (per) {
-          dto.recipientInfo = new PerformerDto(per).toResponse(false);
-          const subscribed = await this.subscriptionService.checkSubscribed(
-            per._id,
-            sender.sourceId
-          );
-          dto.isSubscribed = !!subscribed;
-        }
-      }
-      if (receiver.source === 'user') {
-        dto.isSubscribed = true;
-        const user = await this.userService.findById(receiver.sourceId);
-        if (user) dto.recipientInfo = new UserDto(user).toResponse(false);
-      }
-      return dto;
-    }
-
-    let performerConversation = await this.performerConversationModel.findOne({
-      type: CONVERSATION_TYPE.PRIVATE,
-      recipients: {
-        $all: [
-          {
-            source: sender.source,
-            sourceId: toObjectId(sender.sourceId)
-          },
-          {
-            source: receiver.source,
-            sourceId: receiver.sourceId
-          }
-        ]
-      }
-    });
-
-    if (!performerConversation) {
-      performerConversation = await this.performerConversationModel.create({
+      })
+      .lean()
+      .exec();
+    if (!conversation) {
+      conversation = await this.conversationModel.create({
         type: CONVERSATION_TYPE.PRIVATE,
         recipients: [sender, receiver],
         createdAt: new Date(),
@@ -141,7 +89,7 @@ export class ConversationService {
     }
 
     // TODO - define DTO?
-    const dto = new PerformerConversationDto(performerConversation);
+    const dto = new ConversationDto(conversation);
     dto.totalNotSeenMessages = 0;
     if (receiver.source === 'performer') {
       const per = await this.performerService.findById(receiver.sourceId);
@@ -298,52 +246,14 @@ export class ConversationService {
     };
   }
 
-  public async findById(id: string | ObjectId, user: UserDto | PerformerDto) {
-    if (!user.isPerformer) {
-      const performerConversation = await this.performerConversationModel
-        .findOne({
-          _id: id
-        })
-        .lean()
-        .exec();
-      return new PerformerConversationDto(performerConversation);
-    }
-
-    const userConversation = await this.userConversationModel
+  public async findById(id: string | ObjectId) {
+    const conversation = await this.conversationModel
       .findOne({
         _id: id
       })
       .lean()
       .exec();
-
-    return new UserConversationDto(userConversation);
-  }
-
-  public async findById2(id: string | ObjectId) {
-    let conversation : any;
-
-    conversation = await this.performerConversationModel
-      .findOne({
-        _id: id
-      })
-      .lean()
-      .exec();
-
-    if (!conversation) {
-      conversation = await this.userConversationModel
-        .findOne({
-          _id: id
-        })
-        .lean()
-        .exec();
-      if (conversation) {
-        return new UserConversationDto(conversation);
-      }
-    } else {
-      return new PerformerConversationDto(conversation);
-    }
-
-    return undefined;
+    return new ConversationDto(conversation);
   }
 
   public async addRecipient(

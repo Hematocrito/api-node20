@@ -16,7 +16,6 @@ import { StreamConversationWsGateway, PrivateStreamWsGateway, PublicStreamWsGate
 import { StreamMessageListener, StreamConnectListener } from './listeners';
 import { SettingModule } from '../settings/setting.module';
 import { PerformerDisconnectListener } from './listeners/performer-disconnect.listener';
-import { ConversationService } from '../message/services';
 
 const agent = new https.Agent({
   rejectUnauthorized: process.env.REJECT_UNAUTHORIZED !== 'false'
