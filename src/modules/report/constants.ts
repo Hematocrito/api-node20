@@ -2,6 +2,7 @@ export const REPORT_TARGET = {
   VIDEO: 'video',
   GALLERY: 'gallery',
   PERFORMER: 'performer',
+  FEED: 'feed',
   PRODUCT: 'product'
 };
 
