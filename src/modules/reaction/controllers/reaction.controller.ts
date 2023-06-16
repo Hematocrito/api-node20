@@ -51,6 +51,7 @@ export class ReactionController {
     @CurrentUser() user: UserDto,
     @Body() payload: ReactionCreatePayload
   ): Promise<DataResponse<boolean>> {
+    console.log('Entrando...');
     const data = await this.reactionService.remove(payload, user);
     return DataResponse.ok(data);
   }
