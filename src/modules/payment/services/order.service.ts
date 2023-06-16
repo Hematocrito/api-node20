@@ -637,7 +637,7 @@ export class OrderService {
     buyerSource = 'user',
     orderStatus = ORDER_STATUS.CREATED
   ) {
-    const { type, performerId, paymentGateway = 'ccbill' } = payload;
+    const { type, performerId, paymentGateway } = payload;
     const performer = await this.performerService.findById(performerId);
     if (!performer) {
       throw new EntityNotFoundException();

@@ -767,7 +767,7 @@ export class PerformerService {
 
   public async getPaymentSetting(
     performerId: string | ObjectId,
-    service = 'ccbill'
+    service
   ) {
     return this.paymentGatewaySettingModel.findOne({
       key: service,

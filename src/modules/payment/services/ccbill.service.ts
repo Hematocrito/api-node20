@@ -33,10 +33,9 @@ interface ICCBillCancelSubscription {
 @Injectable()
 export class CCBillService {
   public subscription(options: CCBillSubscription) {
-    const { transactionId } = options;
-    const { salt } = options;
-    const { flexformId } = options;
-    const { subAccountNumber } = options;
+    const {
+      transactionId, salt, flexformId, subAccountNumber
+    } = options;
     const initialPrice = options.price.toFixed(2);
     const initialPeriod = (options.subscriptionType === SUBSCRIPTION_TYPE.MONTHLY || options.subscriptionType === 'monthly_subscription') ? 30 : 365;
     const currencyCode = '840'; // usd

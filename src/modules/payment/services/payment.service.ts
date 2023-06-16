@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   Injectable,
   Inject,
@@ -17,13 +18,16 @@ import { SettingService } from 'src/modules/settings';
 import { PAYMENT_TRANSACTION_MODEL_PROVIDER } from '../providers';
 import { OrderModel, PaymentTransactionModel } from '../models';
 import {
-  PAYMENT_STATUS, TRANSACTION_SUCCESS_CHANNEL, PAYMENT_TYPE
+  PAYMENT_STATUS, TRANSACTION_SUCCESS_CHANNEL, PAYMENT_TYPE, ORDER_STATUS
 } from '../constants';
 import { SubscriptionService } from '../../subscription/services/subscription.service';
 import { CCBillService } from './ccbill.service';
 import { OrderService } from './order.service';
 import { MissingConfigPaymentException } from '../exceptions';
 import { VerotelService } from './verotel.service';
+import { AstropayPaymentsService } from './astropay-payments.service';
+import { AstropayDepositDto } from '../dtos/astropay.dto';
+import { SubscribePerformerPayload } from '../payloads';
 
 @Injectable()
 export class PaymentService {
@@ -37,7 +41,8 @@ export class PaymentService {
     private readonly subscriptionService: SubscriptionService,
     private readonly orderService: OrderService,
     private readonly settingService: SettingService,
-    private readonly verotelService: VerotelService
+    private readonly verotelService: VerotelService,
+    private readonly astropayPaymentsService: AstropayPaymentsService
   ) { }
 
   public async findById(id: string | ObjectId) {
@@ -73,7 +78,7 @@ export class PaymentService {
 
   private async getPerformerSubscroptionPaymentGatewaySetting(
     performerId,
-    paymentGateway = 'ccbill'
+    paymentGateway
   ) {
     const performerPaymentSetting = await this.performerService.getPaymentSetting(
       performerId,
@@ -94,10 +99,13 @@ export class PaymentService {
 
   public async subscribePerformer(
     order: OrderModel,
-    paymentGateway
+    {
+      paymentGateway, performerId, countryCode, currency
+    } : SubscribePerformerPayload
   ) {
     if (paymentGateway === 'astropay') {
-      const transaction = await this.paymentTransactionModel.create({
+      const performer = await this.performerService.findById(performerId);
+      await this.paymentTransactionModel.create({
         paymentGateway,
         orderId: order._id,
         source: order.buyerSource,
@@ -106,26 +114,45 @@ export class PaymentService {
         totalPrice: order.totalPrice,
         status: PAYMENT_STATUS.PENDING
       });
-      const orderDetails = await this.orderService.getDetails(order._id);
-      const description = orderDetails?.map((o) => o.name).join('; ');
-      const data = await this.verotelService.createRecurringRequestFromTransaction(transaction, {
-        description,
-        userId: order.buyerId,
-        performerId: order.sellerId
-      });
-      await this.paymentTransactionModel.updateOne({ _id: transaction._id }, {
-        $set: {
-          paymentToken: data.signature
+      const astroBody : AstropayDepositDto = {
+        amount: order.totalPrice,
+        currency,
+        country: countryCode,
+        merchantDepositId: order._id,
+        callbackUrl: '',
+        user: {
+          merchantUserId: order.buyerId.toString()
+        },
+        product: {
+          mcc: '7995',
+          merchantCode: '0001',
+          description: 'model'
+        },
+        visualInfo: {
+          merchantName: performer.name
         }
-      });
-      return data;
+      };
+      const astropay = await this.astropayPaymentsService.requestDeposit(astroBody);
+      // const orderDetails = await this.orderService.getDetails(order._id);
+      // const description = orderDetails?.map((o) => o.name).join('; ');
+      // const data = await this.verotelService.createRecurringRequestFromTransaction(transaction, {
+      //   description,
+      //   userId: order.buyerId,
+      //   performerId: order.sellerId
+      // });
+      // await this.paymentTransactionModel.updateOne({ _id: transaction._id }, {
+      //   $set: {
+      //     paymentToken: data.signature
+      //   }
+      // });
+      return astropay;
     }
     if (paymentGateway === 'ccbill') {
       const {
         flexformId,
         subAccountNumber,
         salt
-      } = await this.getPerformerSubscroptionPaymentGatewaySetting(order.sellerId);
+      } = await this.getPerformerSubscroptionPaymentGatewaySetting(order.sellerId, paymentGateway);
       const transaction = await this.paymentTransactionModel.create({
         paymentGateway,
         orderId: order._id,
@@ -147,6 +174,44 @@ export class PaymentService {
       });
     }
     throw new MissingConfigPaymentException();
+  }
+
+  public async updtateAstroPaymentStatus(payload: any) {
+    const {
+      deposit_external_id, merchant_deposit_id, deposit_user_id, status, end_status_date
+    } = payload;
+    const transaction = await this.paymentTransactionModel.findOne({
+      orderId: merchant_deposit_id
+    }).exec();
+
+    const order = await this.orderService.findById(merchant_deposit_id);
+
+    if (transaction && order) {
+      if (status === 'APPROVED') {
+        transaction.status = PAYMENT_STATUS.SUCCESS;
+        order.paymentStatus = PAYMENT_STATUS.SUCCESS;
+        order.status = ORDER_STATUS.PAID;
+        transaction.save();
+        order.save();
+      }
+
+      if (status === 'PENDING') {
+        transaction.status = PAYMENT_STATUS.PENDING;
+        order.paymentStatus = PAYMENT_STATUS.PENDING;
+        order.status = ORDER_STATUS.PENDING;
+        transaction.save();
+        order.save();
+      }
+
+      if (status === 'CANCELLED') {
+        transaction.status = PAYMENT_STATUS.CANCELLED;
+        order.paymentStatus = PAYMENT_STATUS.CANCELLED;
+        transaction.save();
+        order.save();
+      }
+    }
+
+    return { transaction, order };
   }
 
   public async purchasePerformerProducts(

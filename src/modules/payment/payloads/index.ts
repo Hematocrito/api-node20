@@ -9,3 +9,4 @@ export * from './purchase-single-photo.payload';
 export * from './cancel-subscription';
 export * from './send-tip.payload';
 export * from './purchase-feed.payload';
+export * from './subscribe-performer.payload';

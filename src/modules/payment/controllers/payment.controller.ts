@@ -25,6 +25,7 @@ import {
 import { UserDto } from '../../user/dtos';
 import { PaymentService } from '../services/payment.service';
 import { OrderService } from '../services';
+import { AstropayDepositPayload } from '../payloads/astropay.payload';
 
 @Injectable()
 @Controller('payment')
@@ -44,7 +45,17 @@ export class PaymentController {
     @Body() payload: SubscribePerformerPayload
   ): Promise<DataResponse<any>> {
     const order = await this.orderService.createForPerformerSubscription(payload, user);
-    const info = await this.paymentService.subscribePerformer(order, payload.paymentGateway || 'ccbill');
+    const info = await this.paymentService.subscribePerformer(order, payload);
+    return DataResponse.ok(info);
+    // return DataResponse.ok(order);
+  }
+
+  @Post('/astropay')
+  @HttpCode(HttpStatus.OK)
+  async updateAstropayStatus(
+    @Body() data: any
+  ): Promise<DataResponse<any>> {
+    const info = await this.paymentService.updtateAstroPaymentStatus(data);
     return DataResponse.ok(info);
     // return DataResponse.ok(order);
   }

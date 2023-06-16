@@ -5,7 +5,8 @@ export const PaymentTransactionSchema = new Schema({
     type: String
   },
   orderId: {
-    type: Schema.Types.ObjectId
+    type: Schema.Types.ObjectId,
+    unique: true
   },
   // user, model, etc...
   source: {

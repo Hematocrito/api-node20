@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller, HttpCode, HttpStatus, Post, UsePipes, ValidationPipe
 } from '@nestjs/common';
 import { AstropayPaymentsService } from '../services/astropay-payments.service';
+import { AstropayDepositPayload } from '../payloads/astropay.payload';
 
 @Controller('astropay-payments')
 export class AstropayPaymentsController {
@@ -12,8 +14,8 @@ export class AstropayPaymentsController {
   @Post('/deposit')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ transform: true}))
-  async requestDeposit() {
-    return this.astropayPaymentsService.requestDeposit();
+  async requestDeposit(@Body() payload: AstropayDepositPayload) {
+    return this.astropayPaymentsService.requestDeposit(payload);
   }
 
   @Post('/cashoutv1')

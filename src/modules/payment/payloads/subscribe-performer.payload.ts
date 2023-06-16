@@ -10,7 +10,16 @@ export class SubscribePerformerPayload {
   @IsIn(['monthly', 'yearly'])
   type: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
+  @IsIn(['ccbill', 'astropay'])
   paymentGateway: string;
+
+  @IsNotEmpty()
+  @IsString()
+  countryCode: string;
+
+  @IsNotEmpty()
+  @IsString()
+  currency: string;
 }
