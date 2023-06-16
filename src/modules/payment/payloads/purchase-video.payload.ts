@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsISIN, IsIn, IsNotEmpty, IsOptional, IsString
+} from 'class-validator';
 
 export class PurchaseVideoPayload {
   @IsOptional()
@@ -9,7 +11,19 @@ export class PurchaseVideoPayload {
   @IsString()
   videoId: string;
 
-  @IsOptional()
+  @IsNotEmpty()
+  performerId: string;
+
+  @IsNotEmpty()
   @IsString()
+  @IsIn(['ccbill', 'astropay'])
   paymentGateway: string;
+
+  @IsNotEmpty()
+  @IsString()
+  countryCode: string;
+
+  @IsNotEmpty()
+  @IsString()
+  currency: string;
 }

@@ -76,7 +76,7 @@ export class PaymentController {
     @Body() payload: PurchaseVideoPayload
   ): Promise<DataResponse<any>> {
     const order = await this.orderService.createFromPerformerVOD(payload, user);
-    const info = await this.paymentService.purchasePerformerVOD(order, payload.paymentGateway || 'ccbill');
+    const info = await this.paymentService.purchasePerformerVOD(order, payload);
     return DataResponse.ok(info);
   }
 

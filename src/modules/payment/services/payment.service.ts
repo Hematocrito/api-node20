@@ -15,8 +15,8 @@ import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { SETTING_KEYS } from 'src/modules/settings/constants';
 import { SettingService } from 'src/modules/settings';
-import { PAYMENT_TRANSACTION_MODEL_PROVIDER } from '../providers';
-import { OrderModel, PaymentTransactionModel } from '../models';
+import { ORDER_DETAIL_MODEL_PROVIDER, PAYMENT_TRANSACTION_MODEL_PROVIDER } from '../providers';
+import { OrderDetailsModel, OrderModel, PaymentTransactionModel } from '../models';
 import {
   PAYMENT_STATUS, TRANSACTION_SUCCESS_CHANNEL, PAYMENT_TYPE, ORDER_STATUS
 } from '../constants';
@@ -27,7 +27,7 @@ import { MissingConfigPaymentException } from '../exceptions';
 import { VerotelService } from './verotel.service';
 import { AstropayPaymentsService } from './astropay-payments.service';
 import { AstropayDepositDto } from '../dtos/astropay.dto';
-import { SubscribePerformerPayload } from '../payloads';
+import { PurchaseVideoPayload, SubscribePerformerPayload } from '../payloads';
 
 @Injectable()
 export class PaymentService {
@@ -36,6 +36,8 @@ export class PaymentService {
     private readonly performerService: PerformerService,
     @Inject(PAYMENT_TRANSACTION_MODEL_PROVIDER)
     private readonly paymentTransactionModel: Model<PaymentTransactionModel>,
+    @Inject(ORDER_DETAIL_MODEL_PROVIDER)
+    private readonly orderDetailModel: Model<OrderDetailsModel>,
     private readonly ccbillService: CCBillService,
     private readonly queueEventService: QueueEventService,
     private readonly subscriptionService: SubscriptionService,
@@ -185,27 +187,39 @@ export class PaymentService {
     }).exec();
 
     const order = await this.orderService.findById(merchant_deposit_id);
+    const orderDetail = await this.orderDetailModel.findOne({
+      orderId: merchant_deposit_id
+    });
 
-    if (transaction && order) {
+    if (transaction && order && orderDetail) {
       if (status === 'APPROVED') {
         transaction.status = PAYMENT_STATUS.SUCCESS;
         order.paymentStatus = PAYMENT_STATUS.SUCCESS;
         order.status = ORDER_STATUS.PAID;
+        orderDetail.paymentStatus = PAYMENT_STATUS.SUCCESS;
+        orderDetail.status = ORDER_STATUS.PAID;
         transaction.save();
         order.save();
+        orderDetail.save();
       }
 
       if (status === 'PENDING') {
         transaction.status = PAYMENT_STATUS.PENDING;
         order.paymentStatus = PAYMENT_STATUS.PENDING;
         order.status = ORDER_STATUS.PENDING;
+        orderDetail.paymentStatus = PAYMENT_STATUS.PENDING;
+        orderDetail.status = ORDER_STATUS.PENDING;
         transaction.save();
         order.save();
+        orderDetail.save();
       }
 
       if (status === 'CANCELLED') {
         transaction.status = PAYMENT_STATUS.CANCELLED;
         order.paymentStatus = PAYMENT_STATUS.CANCELLED;
+        // order.status = ORDER_STATUS.REFUNDED;
+        orderDetail.paymentStatus = PAYMENT_STATUS.CANCELLED;
+        // orderDetail.status = ORDER_STATUS.REFUNDED;
         transaction.save();
         order.save();
       }
@@ -301,9 +315,12 @@ export class PaymentService {
 
   public async purchasePerformerVOD(
     order: OrderModel,
-    paymentGateway
+    {
+      paymentGateway, performerId, countryCode, currency
+    } : PurchaseVideoPayload
   ) {
-    if (paymentGateway === 'verotel') {
+    const performer = await this.performerService.findById(performerId);
+    if (paymentGateway === 'astropay') {
       const transaction = await this.paymentTransactionModel.create({
         paymentGateway,
         orderId: order._id,
@@ -314,18 +331,26 @@ export class PaymentService {
         products: [],
         status: PAYMENT_STATUS.PENDING
       });
-      const orderDetails = await this.orderService.getDetails(order._id);
-      const description = orderDetails?.map((o) => o.name).join('; ');
-      const data = await this.verotelService.createSingleRequestFromTransaction(transaction, {
-        description,
-        userId: order.buyerId
-      });
-      await this.paymentTransactionModel.updateOne({ _id: transaction._id }, {
-        $set: {
-          paymentToken: data.signature
+      const astroBody : AstropayDepositDto = {
+        amount: order.totalPrice,
+        currency,
+        country: countryCode,
+        merchantDepositId: order._id,
+        callbackUrl: '',
+        user: {
+          merchantUserId: order.buyerId.toString()
+        },
+        product: {
+          mcc: '7995',
+          merchantCode: '0001',
+          description: 'model'
+        },
+        visualInfo: {
+          merchantName: performer.name
         }
-      });
-      return data;
+      };
+      const astropay = await this.astropayPaymentsService.requestDeposit(astroBody);
+      return astropay;
     }
     if (paymentGateway === 'ccbill') {
       const {

@@ -392,7 +392,7 @@ export class OrderService {
       deliveryAddress,
       postalCode,
       phoneNumber,
-      paymentGateway = 'ccbill'
+      paymentGateway
     } = payload;
     const productIds = payload.products.map((p) => p._id);
     const prods = await this.productService.findByIds(productIds);
@@ -566,7 +566,7 @@ export class OrderService {
     buyerSource = 'user',
     orderStatus = ORDER_STATUS.CREATED
   ) {
-    const { paymentGateway = 'ccbill', videoId, couponCode } = payload;
+    const { paymentGateway, videoId, couponCode } = payload;
     const video = await this.videoService.findById(videoId);
     if (!video?.isSaleVideo || !video?.price) {
       throw new EntityNotFoundException();
