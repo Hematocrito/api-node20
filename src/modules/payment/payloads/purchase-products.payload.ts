@@ -1,5 +1,5 @@
 import {
-  IsNotEmpty, IsOptional, IsString, IsArray
+  IsNotEmpty, IsOptional, IsString, IsArray, IsIn
 } from 'class-validator';
 
 export class PurchaseProductsPayload {
@@ -28,5 +28,14 @@ export class PurchaseProductsPayload {
 
   @IsOptional()
   @IsString()
+  @IsIn(['ccbill', 'astropay'])
   paymentGateway: string;
+
+  @IsNotEmpty()
+  @IsString()
+  countryCode: string;
+
+  @IsNotEmpty()
+  @IsString()
+  currency: string;
 }

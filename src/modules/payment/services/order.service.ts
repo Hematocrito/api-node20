@@ -771,7 +771,7 @@ export class OrderService {
     buyerSource = 'user',
     orderStatus = ORDER_STATUS.CREATED
   ) {
-    const { paymentGateway = 'ccbill', photoId } = payload;
+    const { paymentGateway, photoId } = payload;
     const photo = await this.photoService.findById(photoId);
     if (!photo?.isSale || !photo?.price) {
       throw new EntityNotFoundException();

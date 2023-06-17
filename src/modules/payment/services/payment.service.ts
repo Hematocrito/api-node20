@@ -27,7 +27,10 @@ import { MissingConfigPaymentException } from '../exceptions';
 import { VerotelService } from './verotel.service';
 import { AstropayPaymentsService } from './astropay-payments.service';
 import { AstropayDepositDto } from '../dtos/astropay.dto';
-import { PurchaseVideoPayload, SubscribePerformerPayload } from '../payloads';
+import {
+  PurchaseFeedPayload,
+  PurchaseProductsPayload, PurchaseSinglePhotoPayload, PurchaseTokenCustomAmountPayload, PurchaseTokenPayload, PurchaseVideoPayload, SubscribePerformerPayload
+} from '../payloads';
 
 @Injectable()
 export class PaymentService {
@@ -230,9 +233,9 @@ export class PaymentService {
 
   public async purchasePerformerProducts(
     order: OrderModel,
-    paymentGateway = 'ccbill'
+    { paymentGateway, countryCode, currency } : PurchaseProductsPayload
   ) {
-    if (paymentGateway === 'verotel') {
+    if (paymentGateway === 'astropay') {
       const transaction = await this.paymentTransactionModel.create({
         paymentGateway,
         orderId: order._id,
@@ -243,18 +246,26 @@ export class PaymentService {
         products: [],
         status: PAYMENT_STATUS.PENDING
       });
-      const orderDetails = await this.orderService.getDetails(order._id);
-      const description = orderDetails?.map((o) => o.name).join('; ');
-      const data = await this.verotelService.createSingleRequestFromTransaction(transaction, {
-        description,
-        userId: order.buyerId
-      });
-      await this.paymentTransactionModel.updateOne({ _id: transaction._id }, {
-        $set: {
-          paymentToken: data.signature
+      const astroBody : AstropayDepositDto = {
+        amount: order.totalPrice,
+        currency,
+        country: countryCode,
+        merchantDepositId: order._id,
+        callbackUrl: '',
+        user: {
+          merchantUserId: order.buyerId.toString()
+        },
+        product: {
+          mcc: '7995',
+          merchantCode: '0001',
+          description: 'model'
+        },
+        visualInfo: {
+          merchantName: 'Product'
         }
-      });
-      return data;
+      };
+      const astropay = await this.astropayPaymentsService.requestDeposit(astroBody);
+      return astropay;
     }
     if (paymentGateway === 'ccbill') {
       const {
@@ -287,30 +298,75 @@ export class PaymentService {
     throw new MissingConfigPaymentException();
   }
 
-  public async purchasePerformerFeed(order: OrderModel, paymentGateway = 'ccbill') {
-    const {
-      flexformId,
-      subAccountNumber,
-      salt
-    } = await this.getPerformerSinglePaymentGatewaySetting(order.sellerId);
+  public async purchasePerformerFeed(order: OrderModel, { paymentGateway, currency, countryCode } : PurchaseFeedPayload) {
+    if (paymentGateway === 'astropay') {
+      const transaction = await this.paymentTransactionModel.create({
+        paymentGateway,
+        orderId: order._id,
+        source: order.buyerSource,
+        sourceId: order.buyerId,
+        type: PAYMENT_TYPE.FEED,
+        totalPrice: order.totalPrice,
+        status: PAYMENT_STATUS.PENDING,
+        products: []
+      });
 
-    const transaction = await this.paymentTransactionModel.create({
-      paymentGateway,
-      orderId: order._id,
-      source: order.buyerSource,
-      sourceId: order.buyerId,
-      type: PAYMENT_TYPE.FEED,
-      totalPrice: order.totalPrice,
-      status: PAYMENT_STATUS.PENDING,
-      products: []
-    });
-    return this.ccbillService.singlePurchase({
-      salt,
-      flexformId,
-      subAccountNumber,
-      price: order.totalPrice,
-      transactionId: transaction._id
-    });
+      await this.paymentTransactionModel.create({
+        paymentGateway,
+        orderId: order._id,
+        source: order.buyerSource,
+        sourceId: order.buyerId,
+        type: order.type,
+        totalPrice: order.totalPrice,
+        status: PAYMENT_STATUS.PENDING
+      });
+      const astroBody : AstropayDepositDto = {
+        amount: order.totalPrice,
+        currency,
+        country: countryCode,
+        merchantDepositId: order._id,
+        callbackUrl: '',
+        user: {
+          merchantUserId: order.buyerId.toString()
+        },
+        product: {
+          mcc: '7995',
+          merchantCode: '0001',
+          description: 'model'
+        },
+        visualInfo: {
+          merchantName: 'Feed'
+        }
+      };
+      const astropay = await this.astropayPaymentsService.requestDeposit(astroBody);
+      return astropay;
+    }
+    if (paymentGateway === 'ccbil') {
+      const {
+        flexformId,
+        subAccountNumber,
+        salt
+      } = await this.getPerformerSinglePaymentGatewaySetting(order.sellerId);
+
+      const transaction = await this.paymentTransactionModel.create({
+        paymentGateway,
+        orderId: order._id,
+        source: order.buyerSource,
+        sourceId: order.buyerId,
+        type: PAYMENT_TYPE.FEED,
+        totalPrice: order.totalPrice,
+        status: PAYMENT_STATUS.PENDING,
+        products: []
+      });
+      return this.ccbillService.singlePurchase({
+        salt,
+        flexformId,
+        subAccountNumber,
+        price: order.totalPrice,
+        transactionId: transaction._id
+      });
+    }
+    throw new MissingConfigPaymentException();
   }
 
   public async purchasePerformerVOD(
@@ -321,7 +377,7 @@ export class PaymentService {
   ) {
     const performer = await this.performerService.findById(performerId);
     if (paymentGateway === 'astropay') {
-      const transaction = await this.paymentTransactionModel.create({
+      await this.paymentTransactionModel.create({
         paymentGateway,
         orderId: order._id,
         source: order.buyerSource,
@@ -383,8 +439,8 @@ export class PaymentService {
     throw new MissingConfigPaymentException();
   }
 
-  public async purchaseWalletPackage(order: OrderModel, paymentGateway) {
-    if (paymentGateway === 'verotel') {
+  public async purchaseWalletPackage(order: OrderModel, { paymentGateway, currency, countryCode } : PurchaseTokenPayload | PurchaseTokenCustomAmountPayload) {
+    if (paymentGateway === 'astropay') {
       const transaction = await this.paymentTransactionModel.create({
         paymentGateway,
         orderId: order._id,
@@ -395,18 +451,26 @@ export class PaymentService {
         products: [],
         status: PAYMENT_STATUS.PENDING
       });
-      const orderDetails = await this.orderService.getDetails(order._id);
-      const description = orderDetails?.map((o) => o.name).join('; ');
-      const data = await this.verotelService.createSingleRequestFromTransaction(transaction, {
-        description,
-        userId: order.buyerId
-      });
-      await this.paymentTransactionModel.updateOne({ _id: transaction._id }, {
-        $set: {
-          paymentToken: data.signature
+      const astroBody : AstropayDepositDto = {
+        amount: order.totalPrice,
+        currency,
+        country: countryCode,
+        merchantDepositId: order._id,
+        callbackUrl: '',
+        user: {
+          merchantUserId: order.buyerId.toString()
+        },
+        product: {
+          mcc: '7995',
+          merchantCode: '0001',
+          description: 'model'
+        },
+        visualInfo: {
+          merchantName: 'Wallet'
         }
-      });
-      return data;
+      };
+      const astropay = await this.astropayPaymentsService.requestDeposit(astroBody);
+      return astropay;
     }
     if (paymentGateway === 'ccbill') {
       const [
@@ -595,10 +659,10 @@ export class PaymentService {
 
   public async purchasePerformerSinglePhoto(
     order: OrderModel,
-    paymentGateway
+    { paymentGateway, currency, countryCode } : PurchaseSinglePhotoPayload
   ) {
-    if (paymentGateway === 'verotel') {
-      const transaction = await this.paymentTransactionModel.create({
+    if (paymentGateway === 'astropay') {
+      await this.paymentTransactionModel.create({
         paymentGateway,
         orderId: order._id,
         source: order.buyerSource,
@@ -608,18 +672,26 @@ export class PaymentService {
         products: [],
         status: PAYMENT_STATUS.PENDING
       });
-      const orderDetails = await this.orderService.getDetails(order._id);
-      const description = orderDetails?.map((o) => o.name).join('; ');
-      const data = await this.verotelService.createSingleRequestFromTransaction(transaction, {
-        description,
-        userId: order.buyerId
-      });
-      await this.paymentTransactionModel.updateOne({ _id: transaction._id }, {
-        $set: {
-          paymentToken: data.signature
+      const astroBody : AstropayDepositDto = {
+        amount: order.totalPrice,
+        currency,
+        country: countryCode,
+        merchantDepositId: order._id,
+        callbackUrl: '',
+        user: {
+          merchantUserId: order.buyerId.toString()
+        },
+        product: {
+          mcc: '7995',
+          merchantCode: '0001',
+          description: 'model'
+        },
+        visualInfo: {
+          merchantName: 'Photo'
         }
-      });
-      return data;
+      };
+      const astropay = await this.astropayPaymentsService.requestDeposit(astroBody);
+      return astropay;
     }
     if (paymentGateway === 'ccbill') {
       const {

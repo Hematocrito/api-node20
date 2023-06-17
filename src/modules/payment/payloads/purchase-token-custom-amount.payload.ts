@@ -1,5 +1,5 @@
 import {
-  IsNotEmpty, IsOptional, IsString, Min, Max, IsNumber
+  IsNotEmpty, IsOptional, IsString, Min, Max, IsNumber, IsIn
 } from 'class-validator';
 
 export class PurchaseTokenCustomAmountPayload {
@@ -8,7 +8,16 @@ export class PurchaseTokenCustomAmountPayload {
   @Min(1)
   amount: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
+  @IsIn(['ccbill', 'astropay'])
   paymentGateway: string;
+
+  @IsNotEmpty()
+  @IsString()
+  countryCode: string;
+
+  @IsNotEmpty()
+  @IsString()
+  currency: string;
 }

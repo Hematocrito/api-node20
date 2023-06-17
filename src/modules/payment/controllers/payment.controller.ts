@@ -90,7 +90,7 @@ export class PaymentController {
     @Body() payload: PurchaseProductsPayload
   ): Promise<DataResponse<any>> {
     const order = await this.orderService.createFromPerformerProducts(payload, user);
-    const info = await this.paymentService.purchasePerformerProducts(order, payload.paymentGateway || 'ccbill');
+    const info = await this.paymentService.purchasePerformerProducts(order, payload);
     return DataResponse.ok(info);
   }
 
@@ -104,7 +104,7 @@ export class PaymentController {
     @Body() payload: PurchaseSinglePhotoPayload
   ): Promise<DataResponse<any>> {
     const order = await this.orderService.createFromPerformerSinglePhoto(payload, user);
-    const info = await this.paymentService.purchasePerformerSinglePhoto(order, payload.paymentGateway || 'ccbill');
+    const info = await this.paymentService.purchasePerformerSinglePhoto(order, payload);
     return DataResponse.ok(info);
   }
 
@@ -118,7 +118,7 @@ export class PaymentController {
     @Body() payload: PurchaseTokenPayload
   ): Promise<DataResponse<any>> {
     const order = await this.orderService.createForWallet(payload, user);
-    const info = await this.paymentService.purchaseWalletPackage(order, payload.paymentGateway || 'ccbill');
+    const info = await this.paymentService.purchaseWalletPackage(order, payload);
     return DataResponse.ok(info);
   }
 
@@ -132,7 +132,7 @@ export class PaymentController {
     @Body() payload: PurchaseTokenCustomAmountPayload
   ): Promise<DataResponse<any>> {
     const order = await this.orderService.createForCustomWalletAmount(payload, user);
-    const info = await this.paymentService.purchaseWalletPackage(order, payload.paymentGateway || 'ccbill');
+    const info = await this.paymentService.purchaseWalletPackage(order, payload);
     return DataResponse.ok(info);
   }
 
@@ -149,7 +149,7 @@ export class PaymentController {
     // eslint-disable-next-line no-param-reassign
     payload.feedId = feedId;
     const order = await this.orderService.createFromPerformerFeed(payload, user);
-    const info = await this.paymentService.purchasePerformerFeed(order);
+    const info = await this.paymentService.purchasePerformerFeed(order, payload);
     return DataResponse.ok(info);
   }
 }

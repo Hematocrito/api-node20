@@ -7,18 +7,15 @@ import { AstropayDepositDto } from '../dtos/astropay.dto';
 @Injectable()
 export class AstropayPaymentsService {
   async requestDeposit(payload: AstropayDepositDto) {
-    console.log('here');
     console.log(payload);
-    console.log('secretkey', process.env.ASTROPAY_SECRET_KEY);
-    console.log('ASTROPAY_API_KEY', process.env.ASTROPAY_API_KEY);
     try {
       const newPayload = {
-        amount: 100,
+        amount: payload.amount,
         currency: payload.currency,
         country: payload.country,
         merchant_deposit_id: payload.merchantDepositId,
-        callback_url: 'https://hitcea-api-dev.herokuapp.com/states/astropay',
-        redirect_url: 'https://redirect.merchant.com/',
+        callback_url: 'https://api.myadultfan.com/payments/astropay',
+        redirect_url: 'https://www.myadultfan.com',
         user: {
           merchant_user_id: payload.user.merchantUserId
         },
@@ -32,18 +29,21 @@ export class AstropayPaymentsService {
           merchant_name: payload.visualInfo.merchantName
         }
       };
-      const hmac = crypto.createHmac('sha256', 'JKK3OAY7SMI7OE3NRVBMUOGPCSZ6CZQT');
+      const hmac = crypto.createHmac('sha256', process.env.ASTROPAY_SECRET_KEY);
       hmac.update(JSON.stringify(newPayload));
       const hash = hmac.digest('hex');
       const headers: AxiosRequestConfig['headers'] = {
         'Content-Type': 'application/json',
         Signature: hash,
-        'Merchant-Gateway-Api-Key': 'lOUZkGTgkhv9EqvV0rshfL8M1wccTUZnPF7ZITDfuHLr145C7xVMUBX8wQLVjWW8'
+        'Merchant-Gateway-Api-Key': process.env.ASTROPAY_API_KEY
 
       };
       const res = await axios.post('https://onetouch-api-sandbox.astropay.com/merchant/v1/deposit/init', newPayload, { headers });
       console.log('response', res.data);
-      return res.data;
+      return {
+        ...res.data,
+        paymentUrl: res.data.url
+      };
     } catch (error) {
       console.log('error====', error);
       return {
