@@ -341,7 +341,7 @@ export class PaymentService {
       const astropay = await this.astropayPaymentsService.requestDeposit(astroBody);
       return astropay;
     }
-    if (paymentGateway === 'ccbil') {
+    if (paymentGateway === 'ccbill') {
       const {
         flexformId,
         subAccountNumber,
