@@ -39,7 +39,7 @@ export class PerformerCacheService {
     performers.forEach((p) => {
       if (p.status === PERFORMER_STATUSES.ACTIVE && p.verifiedDocument) activePerformers.push(p._id.toString());
       else if (p.status === PERFORMER_STATUSES.INACTIVE) inactivePerformers.push(p._id.toString());
-      //else pendingPerformers.push(p._id.toString());
+      // else pendingPerformers.push(p._id.toString());
     });
 
     const redisClient = this.redisService.getClient();

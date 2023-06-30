@@ -80,6 +80,7 @@ export class SettingService {
 
   async create(data: SettingCreatePayload): Promise<SettingModel> {
     const setting = await this.get(data.key);
+    console.log('Encontró ', setting);
     if (setting) {
       throw new HttpException('Setting key exist', 400);
     }

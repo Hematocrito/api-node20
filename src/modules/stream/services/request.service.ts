@@ -36,12 +36,11 @@ export class RequestService {
               resolve(DataResponse.error(new Error('Bad Request'), code));
               return;
             }
-
+            console.log('STATUS ', resp?.status);
             if (resp?.status && [400, 200].includes(resp.status)) {
               resolve(DataResponse.ok(resp.data));
               return;
             }
-
             resolve(
               DataResponse.error(
                 new Error('Stream Server Error'),
