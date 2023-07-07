@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { toObjectId } from 'src/kernel/helpers/string.helper';
@@ -271,6 +271,15 @@ export class ConversationService {
       })
       .lean()
       .exec();
+  }
+
+  public async removeConversation(conversationId: string | ObjectId) {
+    try {
+      const conversationDeleted = await this.conversationModel.findByIdAndRemove(conversationId).lean().exec();
+      return conversationDeleted;
+    } catch (error) {
+      return error;
+    }
   }
 
   public async getPrivateConversationByStreamId(streamId: string | ObjectId) {
