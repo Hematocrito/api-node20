@@ -10,12 +10,13 @@ import {
   ForbiddenException,
   Post,
   Param,
-  Query
+  Query,
+  Delete
 } from '@nestjs/common';
 import { DataResponse } from 'src/kernel';
 import { AuthGuard } from 'src/modules/auth/guards';
 import { toObjectId } from 'src/kernel/helpers/string.helper';
-import { CurrentUser } from 'src/modules/auth';
+import { CurrentUser, Roles } from 'src/modules/auth';
 import { CountryService } from 'src/modules/utils/services';
 import { ConversationDto } from '../dtos';
 import { ConversationService } from '../services/conversation.service';
@@ -92,6 +93,15 @@ export class ConversationController {
     );
 
     return DataResponse.ok(conversation);
+  }
+
+  @Delete(':conversationId')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  // @Roles('user', 'performer')
+  async removeConversation(@Param('conversationId') conversationId: string): Promise<DataResponse<any>> {
+    const conversationDeleted = await this.conversationService.removeConversation(conversationId);
+    return DataResponse.ok(conversationDeleted);
   }
 
   @Get('/stream/public/:performerId')
