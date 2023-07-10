@@ -173,10 +173,10 @@ export class PerformerSearchService {
       };
     }
     let sort = {
-      createdAt: -1
+      // createdAt: -1
     } as any;
-    if (req.sortBy === 'latest') {
-      sort = '-createdAt';
+    if (req.isOnline === true) {
+      sort = '-isOnline';
     }
     if (req.sortBy === 'oldest') {
       sort = 'createdAt';

@@ -43,4 +43,8 @@ export class PerformerSearchPayload extends SearchRequest {
   @IsString()
   @IsOptional()
   isStreaming: string | boolean;
+
+  @IsString()
+  @IsOptional()
+  isOnline: string | boolean;
 }
