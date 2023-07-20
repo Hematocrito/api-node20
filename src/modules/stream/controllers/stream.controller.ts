@@ -34,12 +34,10 @@ export class StreamController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async goLive(@CurrentUser() performer: PerformerDto) {
     // if it is not active, throw error
-    console.log('Go Live');
     const isActive = await this.performerCacheService.isActivePerformer(performer._id);
     if (!isActive) {
       throw new HttpException('You can Go Live only when your account is approved by admin.', 400);
     }
-
     const data = await this.streamService.goLive(performer._id);
     return DataResponse.ok(data);
   }
