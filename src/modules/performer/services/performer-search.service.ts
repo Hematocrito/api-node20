@@ -173,6 +173,9 @@ export class PerformerSearchService {
       };
     }
     let sort = '-isOnline';
+    if (req.sortBy === 'latest') {
+      sort = '-createdAt';
+    }
     if (req.sortBy === 'oldest') {
       sort = 'createdAt';
     }
