@@ -224,79 +224,10 @@ export class AuthService {
       data: {
         forgotLink
       },
-      template: `<!DOCTYPE html>
-      <html>
-      <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <style>
-      * {
-        box-sizing: border-box;
-      }
-      html{
-        margin-left: 0;
-        margin-right: 0;
-      }
-      a {
-        padding:15px;
-        text-decoration: none;
-        text-align: center;
-        color: #00B2FF;
-        display: block;
-        margin: 0 auto;
-        width: 140px;
-        border-radius: 30px;
-        }
-      @media only screen and (max-width:800px) {
-        /* For tablets: */
-        html {
-          margin-left:0;
-        margin-right:0;
-        }
-        a {
-        padding:10px;
-        text-decoration: none;
-        text-align: center;
-        color: #00B2FF;
-        display: block;
-        margin: 0 auto;
-        width: 140px;
-        border-radius: 30px;
-        }
-      }
-      @media only screen and (max-width:500px) {
-        /* For mobile phones: */
-        html {
-          width: 100%;
-        margin-left:0;
-        margin-right:0;
-        }
-        a {
-        padding:10px;
-        text-decoration: none;
-        text-align: center;
-        color: #00B2FF;
-        display: block;
-        margin: 0 auto;
-        width: 140px;
-        border-radius: 30px;
-        }
-      }
-      </style>
-      </head>
-      <body style="font-family: Arial, Helvetica, sans-serif;">
-        <img src="https://myadultfan.com/logo.png" width="35%" height="auto" style="margin-bottom: -15px; margin-top: -15px;">
-        
-        <img src="https://myadultfan.com/img-email.jpg" width="100%" height="auto" >    
-        
-        <p style="font-size: 14px; margin-left: 45px; margin-right: 40px; margin-top: 30px;">Hi,</p>
-        <p style="font-size: 14px; margin-left: 45px; margin-right: 40px; margin-top: 30px;">
-          Please click <a href="${forgotLink}">here</a> or copy link below to your browser to recover your password.</p>
-        <p style="color: #00B2FF; margin-top: 30px; margin-bottom: 20px; text-align: center;">${forgotLink}</p>
-        <span></span>
-        <p style="font-size: 14px; margin-left: 45px; margin-right: 40px; margin-top: 30px;">
-          Note: The link will be expried within 24hrs.</p>
-      </body>
-      </html>`
+      template: `<p>Hi,</p>
+      <p>Please click <a href="${forgotLink}">here</a> or copy link below to your browser to recover your password.</p>
+      <p>${forgotLink}</p>
+      <p>Note: The link will be expried within 24hrs.</p>`
     });
     return true;
   }
