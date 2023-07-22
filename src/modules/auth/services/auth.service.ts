@@ -216,7 +216,8 @@ export class AuthService {
       updatedAt: new Date()
     });
 
-    const forgotLink = new URL(`auth/password-change?token=${token}`, getConfig('app').baseUrl).href;
+    const forgotLink = `${process.env.BASE_URL_PROD}/auth/password-change?token=${token}`;
+    // const forgotLink = new URL(`auth/password-change?token=${token}`, getConfig('app').baseUrl).href;
     await this.mailService.sendEmail({
       subject: 'Recover password',
       to: source.email,
@@ -288,7 +289,92 @@ export class AuthService {
         verificationLink,
         siteName
       },
-      template
+      template: `<!DOCTYPE html>
+      <html>
+      <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+      * {
+        box-sizing: border-box;
+      }
+      html{
+        margin-left: 0;
+        margin-right: 0;
+      }
+      a {
+        background: #00B2FF;
+        padding:15px;
+        text-decoration: none;
+        text-align: center;
+        color: white;
+        display: block;
+        margin: 0 auto;
+        width: 140px;
+        border-radius: 30px;
+        }
+      @media only screen and (max-width:800px) {
+        /* For tablets: */
+        html {
+          margin-left:0;
+        margin-right:0;
+        }
+        a {
+        background: #00B2FF;
+        padding:10px;
+        text-decoration: none;
+        text-align: center;
+        color: white;
+        display: block;
+        margin: 0 auto;
+        width: 140px;
+        border-radius: 30px;
+        }
+      }
+      @media only screen and (max-width:500px) {
+        /* For mobile phones: */
+        html {
+          width: 100%;
+        margin-left:0;
+        margin-right:0;
+        }
+        a {
+        background: #00B2FF;
+        padding:10px;
+        text-decoration: none;
+        text-align: center;
+        color: white;
+        display: block;
+        margin: 0 auto;
+        width: 140px;
+        border-radius: 30px;
+        }
+      }
+      </style>
+      </head>
+      <body style="font-family: Arial, Helvetica, sans-serif;">
+        <img src="https://myadultfan.com/logo.png" width="35%" height="auto" style="margin-bottom: -15px; margin-top: -15px;">
+        
+        <img src="https://myadultfan.com/img-email.jpg" width="100%" height="auto" >    
+        <div style="background-color: #00B2FF; width: 100%; height: 42px;">
+          <p style="color:white; text-align: center; margin: 0; padding-top: 14px; font-size: small;">
+            Please Confirm Your Account To Get Started
+          </p>
+        </div>
+        <h1 style="font-size: 18px; font-weight: 900; margin-left: 45px; margin-top: 30px;">Welcome to MyAdultFan</h1>
+        <p style="font-size: 14px; margin-left: 45px; font-weight: 900">Hi there,</p>
+        <p style="font-size: 14px; margin-left: 45px; margin-right: 40px; margin-bottom: 25px;">
+          You are almost ready to start interacting with other users and another influencers. Please confirm your email address by clicking
+          the link below.
+        </p>
+        <a href="${verificationLink}" target="_blank">Yes, it's me</a>
+        <span></span>
+        <p style="font-size: 14px; margin-left: 45px; margin-right: 40px; margin-top: 30px;">
+          By verifying your email address, you confirm your registration and that you are over 18 years of age. We will use
+          this email address to keep you abreast of product updates, important information about your account, news and special offers.
+        </p>
+        <p style="color: #00B2FF; margin-top: 30px; margin-bottom: 20px; text-align: center;">${verificationLink}</p>
+      </body>
+      </html>`
     });
   }
 
