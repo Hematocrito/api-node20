@@ -217,13 +217,16 @@ export class AuthService {
     });
 
     const forgotLink = new URL(`auth/password-change?token=${token}`, getConfig('app').baseUrl).href;
-    await this.mailService.send({
+    await this.mailService.sendEmail({
       subject: 'Recover password',
       to: source.email,
       data: {
         forgotLink
       },
-      template: 'forgot'
+      template: `<p>Hi,</p>
+      <p>Please click <a href="${forgotLink}">here</a> or copy link below to your browser to recover your password.</p>
+      <p>${forgotLink}</p>
+      <p>Note: The link will be expried within 24hrs.</p>`
     });
     return true;
   }
