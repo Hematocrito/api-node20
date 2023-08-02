@@ -42,7 +42,7 @@ export class NotificationController {
     return DataResponse.ok(data);
   }
 
-  @Get('/create')
+  @Post('/create')
   @HttpCode(HttpStatus.OK)
   @Roles('user, performer')
   @UseGuards(AuthGuard)
