@@ -46,4 +46,9 @@ export class UserUpdatePayload {
   @IsString()
   @IsOptional()
   country: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  deviceToken: string;
 }
