@@ -70,6 +70,8 @@ export class UserDto {
 
   updatedAt?: Date;
 
+  deviceToken?: string;
+
   constructor(data?: Partial<UserDto>) {
     data
       && Object.assign(
@@ -89,6 +91,7 @@ export class UserDto {
           'username',
           'gender',
           'country',
+          'deviceToken',
           'verifiedEmail',
           'isOnline',
           'isPerformer',
@@ -119,6 +122,7 @@ export class UserDto {
       isPerformer: this.isPerformer,
       gender: this.gender,
       country: this.country,
+      deviceToken: this.deviceToken,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };

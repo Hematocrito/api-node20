@@ -105,12 +105,14 @@ export class UserService {
     user.username = data.username && data.username.trim().toLowerCase();
     user.createdAt = new Date();
     user.updatedAt = new Date();
+    user.deviceToken = data.deviceToken;
     user.roles = options.roles || [ROLE_USER];
     user.status = options.status || STATUS_ACTIVE;
     if (!user.name) {
       user.name = [user.firstName || '', user.lastName || ''].join(' ');
     }
     const resp = await this.userModel.create(user);
+    console.log('Resp ', resp);
     return resp;
   }
 
@@ -156,6 +158,7 @@ export class UserService {
       }
       data.email = data.email.toLowerCase();
       data.verifiedEmail = false;
+      data.deviceToken;
     }
     await this.userModel.updateOne({ _id: id }, data);
     const newUser = await this.userModel.findById(id);

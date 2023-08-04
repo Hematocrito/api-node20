@@ -38,6 +38,8 @@ export class UserModel extends Document {
 
   updatedAt: Date;
 
+  deviceToken?: string;
+
   verifiedEmail: boolean;
 
   stats: {

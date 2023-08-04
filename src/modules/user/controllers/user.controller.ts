@@ -45,7 +45,7 @@ export class UserController {
     @Body() payload: UserUpdatePayload
   ): Promise<DataResponse<IUserResponse>> {
     const data = omit(payload, EXCLUSIVE_FIELDS) as any;
-    await this.userService.update(currentUser._id, data, currentUser);
+    const up = await this.userService.update(currentUser._id, data, currentUser);
     const user = await this.userService.findById(currentUser._id);
     return DataResponse.ok(new UserDto(user).toResponse(true));
   }

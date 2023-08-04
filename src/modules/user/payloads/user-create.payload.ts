@@ -57,6 +57,11 @@ export class UserCreatePayload {
   country: string;
 
   @ApiProperty()
+  @IsString()
+  @IsOptional()
+  deviceToken: string;
+
+  @ApiProperty()
   @IsBoolean()
   @IsOptional()
   verifiedEmail: boolean;
@@ -71,6 +76,7 @@ export class UserCreatePayload {
       this.username = params.username;
       this.gender = params.gender;
       this.country = params.country;
+      this.deviceToken = params.deviceToken;
     }
   }
 }

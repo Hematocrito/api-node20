@@ -4,7 +4,8 @@ import {
   MinLength,
   IsNotEmpty,
   Validate,
-  IsIn
+  IsIn,
+  IsOptional
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Username } from 'src/modules/user/validators/username.validator';
@@ -54,4 +55,9 @@ export class UserRegisterPayload {
   @IsString()
   @IsNotEmpty()
   country: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  tokenDevice: string;
 }

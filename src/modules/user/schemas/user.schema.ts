@@ -53,6 +53,9 @@ export const userSchema = new mongoose.Schema({
   country: {
     type: String
   },
+  deviceToken: {
+    type: String
+  },
   isOnline: {
     type: Number,
     default: 0
