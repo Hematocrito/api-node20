@@ -68,6 +68,16 @@ export class UserController {
     return DataResponse.ok(await this.userSearchService.performerSearch(req));
   }
 
+  @Get('/everyone')
+  @Roles('user')
+  @UseGuards(RoleGuard)
+  @HttpCode(HttpStatus.OK)
+  async searchAll(
+    @Query() req: UserSearchRequestPayload
+  ): Promise<DataResponse<PageableData<IUserResponse>>> {
+    return DataResponse.ok(await this.userSearchService.search(req));
+  }
+
   @Get('/:id/balance')
   @Roles('performer')
   @UseGuards(RoleGuard)

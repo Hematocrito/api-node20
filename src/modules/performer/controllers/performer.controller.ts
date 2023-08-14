@@ -154,6 +154,14 @@ export class PerformerController {
     return DataResponse.ok(new PerformerDto(performer).toResponse(true, false));
   }
 
+  @Get('/status/:id')
+  @Roles('performer')
+  @UseGuards(RoleGuard)
+  @HttpCode(HttpStatus.OK)
+  updateStatus(): string {
+    return 'llegó';
+  }
+
   @Delete('/:id')
   @UseGuards(RoleGuard)
   @HttpCode(HttpStatus.OK)

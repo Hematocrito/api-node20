@@ -14,17 +14,20 @@ import {
 import { AuthGuard, RoleGuard } from 'src/modules/auth/guards';
 import { DataResponse } from 'src/kernel';
 import { CurrentUser, Roles } from 'src/modules/auth';
+import { PerformerModel } from 'src/modules/performer/models';
 import { PerformerDto } from 'src/modules/performer/dtos';
 import { UserInterceptor } from 'src/modules/auth/interceptors';
 import { UserDto } from 'src/modules/user/dtos';
 import { PerformerCacheService } from 'src/modules/performer/services/performer-cache.service';
+import { PerformerService } from 'src/modules/performer/services';
 import { StreamService } from '../services/stream.service';
 
 @Controller('streaming')
 export class StreamController {
   constructor(
     private readonly streamService: StreamService,
-    private readonly performerCacheService: PerformerCacheService
+    private readonly performerCacheService: PerformerCacheService,
+    private readonly performerService: PerformerService
   ) {}
 
   @Post('/live')

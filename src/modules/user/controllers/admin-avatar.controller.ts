@@ -33,7 +33,7 @@ export class AdminAvatarController {
       replaceByThumbnail: true,
       thumbnailSize: getConfig('image').avatar
       // TODO - check option fir resize, etc...
-    })
+      })
   )
   async uploadUserAvatar(
     @Param('id') userId: string,

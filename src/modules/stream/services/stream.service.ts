@@ -14,6 +14,7 @@ import { ConversationService } from 'src/modules/message/services';
 import { SubscriptionService } from 'src/modules/subscription/services/subscription.service';
 import { UserDto } from 'src/modules/user/dtos';
 import { RedisService } from 'nestjs-redis';
+import { PerformerModel } from 'src/modules/performer/models';
 import { RequestService } from './request.service';
 import { SocketUserService } from '../../socket/services/socket-user.service';
 import {
@@ -25,6 +26,7 @@ import {
 import { IStream, StreamDto } from '../dtos';
 import { StreamModel } from '../models';
 import { STREAM_MODEL_PROVIDER } from '../providers/stream.provider';
+import { PERFORMER_MODEL_PROVIDER } from '../../performer/providers';
 import {
   StreamOfflineException,
   StreamServerErrorException
@@ -97,6 +99,7 @@ export class StreamService {
       performerId,
       type: PUBLIC_CHAT
     });
+
     if (!stream) {
       const data: IStream = {
         sessionId: uuidv4(),
