@@ -69,7 +69,6 @@ export class UserController {
   }
 
   @Get('/everyone')
-  @Roles('user, performer')
   @UseGuards(RoleGuard)
   @HttpCode(HttpStatus.OK)
   async searchAll(
