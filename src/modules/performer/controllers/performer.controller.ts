@@ -42,7 +42,7 @@ import {
   PerformerDto, IPerformerResponse
 } from '../dtos';
 import {
-  SelfUpdatePayload, PerformerSearchPayload, BankingSettingPayload, PaymentGatewaySettingPayload
+  SelfUpdatePayload, PerformerSearchPayload, BankingSettingPayload, PaymentGatewaySettingPayload, PerformerStreamingPayload
 } from '../payloads';
 import { PerformerService, PerformerSearchService } from '../services';
 import { RankingPerformerService } from '../services/ranking-performer.service';
@@ -154,12 +154,16 @@ export class PerformerController {
     return DataResponse.ok(new PerformerDto(performer).toResponse(true, false));
   }
 
-  @Get('/status/:id')
+  @Put('/status/:id')
   @Roles('performer')
   @UseGuards(RoleGuard)
   @HttpCode(HttpStatus.OK)
-  updateStatus(): string {
-    return 'llegó';
+  async updateStatus(
+    @Body() payload: PerformerStreamingPayload,
+    @Param('id') performerId: string
+  ) {
+    const result = await this.performerService.updateStatus(performerId, payload);
+    return result;
   }
 
   @Delete('/:id')

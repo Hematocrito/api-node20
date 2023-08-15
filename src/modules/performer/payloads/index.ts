@@ -5,3 +5,4 @@ export * from './performer-search.payload';
 export * from './payment-gateway-setting.payload';
 export * from './commission-setting.payload';
 export * from './banking-setting.payload';
+export * from './performer-streraming.payload';

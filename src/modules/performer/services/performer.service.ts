@@ -40,7 +40,8 @@ import {
   SelfUpdatePayload,
   PaymentGatewaySettingPayload,
   CommissionSettingPayload,
-  BankingSettingPayload
+  BankingSettingPayload,
+  PerformerStreamingPayload
 } from '../payloads';
 import {
   PERFORMER_BANKING_SETTING_MODEL_PROVIDER,
@@ -642,6 +643,22 @@ export class PerformerService {
         type: 'username'
       });
     }
+    return true;
+  }
+
+  public async updateStatus(
+    id: string | ObjectId,
+    payload: PerformerStreamingPayload
+  ): Promise<boolean> {
+    const performer = await this.performerModel.findById(id);
+    if (!performer) {
+      throw new EntityNotFoundException();
+    }
+    const data = { ...payload } as any;
+
+    await this.performerModel.updateOne({ _id: id }, data);
+    const newPerformer = await this.performerModel.findById(id);
+
     return true;
   }
 
