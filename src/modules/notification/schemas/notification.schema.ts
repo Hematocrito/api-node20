@@ -17,7 +17,11 @@ export const NotificationSchema = new Schema({
     default: false
   },
   readAt: Date,
-  createdBy: ObjectId,
+  createdBy: {
+    type: ObjectId,
+    ref: 'createdByModel'
+  },
+  createdByModel: String,
   createdAt: {
     type: Date,
     default: Date.now
