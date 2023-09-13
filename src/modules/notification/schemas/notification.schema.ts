@@ -19,9 +19,12 @@ export const NotificationSchema = new Schema({
   readAt: Date,
   createdBy: {
     type: ObjectId,
-    ref: 'createdByModel'
+    refPath: 'createdByModel'
   },
-  createdByModel: String,
+  createdByModel: {
+    type: String,
+    enum: ['Performer', 'User']
+  },
   createdAt: {
     type: Date,
     default: Date.now

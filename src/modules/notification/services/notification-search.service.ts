@@ -42,10 +42,7 @@ export class NotificationSearchService {
     const [notifications, total] = await Promise.all([
       this.notificationModel
         .find(query)
-        .populate({
-          path: 'createdBy',
-          model
-        })
+        .populate('createdBy')
         .limit(+payload.limit)
         .skip(+payload.offset)
         .sort(sort)

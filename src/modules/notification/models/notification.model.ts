@@ -22,7 +22,7 @@ export class NotificationModel extends Document {
 
   createdBy: ObjectId;
 
-  createdByModel : string;
+  createdByModel: string;
 
   createdAt: Date;
 
