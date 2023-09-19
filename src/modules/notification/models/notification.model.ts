@@ -22,6 +22,8 @@ export class NotificationModel extends Document {
 
   createdBy: ObjectId;
 
+  createdByModel: string;
+
   createdAt: Date;
 
   updatedAt: Date;

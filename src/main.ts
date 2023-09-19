@@ -19,7 +19,7 @@ const session = require('express-session');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ['error', 'warn', 'log'] 
+    logger: ['error', 'warn', 'log']
   });
   const httpAdapter = app.getHttpAdapter();
 

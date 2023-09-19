@@ -18,29 +18,29 @@ import { NotificationService, NotificationSearchService } from './services';
 
 @Module({
   imports: [
-    AuthModule,
-    MongoDBModule,
-    QueueModule.forRoot(),
-    SocketModule,
-    forwardRef(() => UserModule),
-    forwardRef(() => SubscriptionModule),
-    forwardRef(() => PerformerModule),
-    forwardRef(() => PerformerAssetsModule)
+  AuthModule,
+  MongoDBModule,
+  QueueModule.forRoot(),
+  SocketModule,
+  forwardRef(() => UserModule),
+  forwardRef(() => SubscriptionModule),
+  forwardRef(() => PerformerModule),
+  forwardRef(() => PerformerAssetsModule)
   ],
   providers: [
-    {
-      inject: [MONGO_DB_PROVIDER],
-      useFactory: (connection: Connection) => connection.model('Notitcation', NotificationSchema),
-      provide: NOTIFICATION_MODEL_PROVIDER
-    },
-    NotificationService,
-    NotificationSearchService,
-    NotificationListener,
-    ReactionNotificationListener,
-    VideoNotificationListener,
-    PublicStreamNotificationListener
+  {
+  inject: [MONGO_DB_PROVIDER],
+  useFactory: (connection: Connection) => connection.model('Notitcation', NotificationSchema),
+  provide: NOTIFICATION_MODEL_PROVIDER
+  },
+  NotificationService,
+  NotificationSearchService,
+  NotificationListener,
+  ReactionNotificationListener,
+  VideoNotificationListener,
+  PublicStreamNotificationListener
   ],
   controllers: [NotificationSearchController, NotificationController],
   exports: [NotificationService]
-})
+  })
 export class NotifcationModule {}

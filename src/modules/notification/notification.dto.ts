@@ -1,4 +1,5 @@
 import { Expose } from 'class-transformer';
+import { IsNotEmpty, IsString, IsIn } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 export class NotificationDto {
@@ -28,6 +29,12 @@ export class NotificationDto {
 
   @Expose()
   createdBy: ObjectId;
+
+  @Expose()
+  @IsString()
+  @IsIn(['Performer', 'User'])
+  @IsNotEmpty()
+  createdByModel: string;
 
   @Expose()
   createdAt: Date;
