@@ -126,6 +126,10 @@ const performerSchema = new mongoose.Schema({
       type: Number,
       default: 0
     },
+    totalFeeds: {
+      type: Number,
+      default: 0
+    },
     totalVideos: {
       type: Number,
       default: 0

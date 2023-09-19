@@ -261,6 +261,17 @@ export class FeedService {
         data: new FeedDto(feed)
       })
     );
+    const totalFeeds = await this.feedModel.find({
+      fromSourceId: fromSourceId.toString()
+    });
+
+    if (totalFeeds.length >= 0) {
+      // Actualiazando stats.totalFeeds del performer
+      const performerUpdated = await this.performerService.findById(performer._id);
+      performerUpdated.stats.totalFeeds = totalFeeds.length;
+      performerUpdated.save();
+    }
+
     return feed;
   }
 
@@ -465,6 +476,17 @@ export class FeedService {
         data: new FeedDto(feed)
       })
     );
+
+    const totalFeeds = await this.feedModel.find({
+      fromSourceId: user._id
+    });
+
+    if (totalFeeds.length >= 0) {
+      // Actualiazando stats.totalFeeds del performer
+      const performerUpdated = await this.performerService.findById(user._id);
+      performerUpdated.stats.totalFeeds = totalFeeds.length;
+      performerUpdated.save();
+    }
     return { success: true };
   }
 
