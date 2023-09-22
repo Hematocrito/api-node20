@@ -12,6 +12,11 @@ export const NotificationSchema = new Schema({
   message: String,
   thumbnail: String,
   refId: ObjectId,
+  fromSourceId: {
+    type: Schema.Types.ObjectId,
+    index: true,
+    ref: 'Performer'
+  },
   read: {
     type: Boolean,
     default: false

@@ -15,6 +15,7 @@ import { VideoNotificationListener } from './listeners/video-create-notification
 import { NOTIFICATION_MODEL_PROVIDER } from './notification.constant';
 import { NotificationSchema } from './schemas';
 import { NotificationService, NotificationSearchService } from './services';
+import { FeedModule } from '../feed/feed.module';
 
 @Module({
   imports: [
@@ -22,6 +23,8 @@ import { NotificationService, NotificationSearchService } from './services';
   MongoDBModule,
   QueueModule.forRoot(),
   SocketModule,
+  FeedModule,
+  PerformerAssetsModule,
   forwardRef(() => UserModule),
   forwardRef(() => SubscriptionModule),
   forwardRef(() => PerformerModule),
