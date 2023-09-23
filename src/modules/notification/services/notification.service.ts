@@ -47,7 +47,7 @@ export class NotificationService {
     }
 
     if (!notification) {
-      return this.notificationModel.create(options);
+      this.notificationModel.create(options);
     }
 
     merge(notification, options);
