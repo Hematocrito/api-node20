@@ -25,36 +25,22 @@ export class NotificationService {
   ) { }
 
   async create(options: CreateNotificationOptions) {
-    const notification = await this.notificationModel.findOne({
-      type: options.type,
-      action: options.action,
-      userId: toObjectId(options.userId),
-      createdBy: toObjectId(options.createdBy)
-    });
-
-    let titulo:any;
+    const objeto = options;
     if (options.type === 'feed') {
       const post = await this.feedModel.findOne({ _id: options.refId });
-      titulo = post.text;
+      objeto.title = post.text;
     }
     if (options.type === 'video') {
       const video = await this.performerVideoModel.findOne({ _id: options.refId });
-      titulo = video.title;
+      objeto.title = video.title;
     }
     if (options.type === 'gallery') {
       const galeria = await this.galleryModel.findOne({ _id: options.refId });
-      titulo = galeria.name;
+      objeto.title = galeria.name;
     }
 
-    if (!notification) {
-      this.notificationModel.create(options);
-    }
+    const notification = this.notificationModel.create(objeto);
 
-    merge(notification, options);
-    notification.title = titulo;
-    notification.updatedAt = new Date();
-    notification.read = false;
-    await notification.save();
     return notification;
   }
 
