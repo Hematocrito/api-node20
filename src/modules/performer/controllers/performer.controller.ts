@@ -97,9 +97,6 @@ export class PerformerController {
         countryCode = userCountry.countryCode;
       }
     }
-    console.log('Query ', query);
-    console.log('User ', user);
-    console.log('CountryCode ', countryCode);
     const data = await this.performerSearchService.search(query, user, countryCode);
     return DataResponse.ok(data);
   }

@@ -172,7 +172,9 @@ export class PerformerSearchService {
         $in: activePerformers
       };
     }
-    let sort = '-isOnline';
+    let sort = {
+      createdAt: -1
+    } as any;
     if (req.sortBy === 'latest') {
       sort = '-createdAt';
     }
@@ -185,7 +187,7 @@ export class PerformerSearchService {
     if (req.sortBy === 'subscriber') {
       sort = '-stats.subscribers';
     }
-    console.log('Query ', query);
+
     const [data, total] = await Promise.all([
       this.performerModel
         .find(query)

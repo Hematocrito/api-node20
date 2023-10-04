@@ -868,18 +868,14 @@ export class PerformerService {
   public async updateVerificationStatus(
     userId: string | ObjectId
   ): Promise<any> {
+    const data:any = {};
+    data.verifiedEmail = true;
+    data.status = PERFORMER_STATUSES.ACTIVE;
+
     const user = await this.performerModel.findById(userId);
-    console.log('user', user);
+
     if (!user) return true;
-    return this.performerModel.updateOne(
-      {
-        _id: userId
-      },
-      {
-        verifiedEmail: true,
-        status: PERFORMER_STATUSES.ACTIVE
-      }
-    );
+    return this.performerModel.updateOne({ _id: userId }, data);
   }
 
   public async getCommissions(performerId: string | ObjectId) {
