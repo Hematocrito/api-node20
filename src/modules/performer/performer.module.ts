@@ -33,49 +33,49 @@ import { SocketModule } from '../socket/socket.module';
 
 @Module({
   imports: [
-    MongoDBModule,
-    AgendaModule.register(),
-    // https://github.com/kyknow/nestjs-redis
-    RedisModule.forRootAsync({
-      // TODO - load config for redis socket
-      useFactory: (configService: ConfigService) => configService.get('redis'),
-      // useFactory: async (configService: ConfigService) => configService.get('redis'),
-      inject: [ConfigService]
+  MongoDBModule,
+  AgendaModule.register(),
+// https://github.com/kyknow/nestjs-redis
+  RedisModule.forRootAsync({
+// TODO - load config for redis socket
+    useFactory: (configService: ConfigService) => configService.get('redis'),
+// useFactory: async (configService: ConfigService) => configService.get('redis'),
+    inject: [ConfigService]
     }),
-    forwardRef(() => UserModule),
-    forwardRef(() => AuthModule),
-    forwardRef(() => FileModule),
-    forwardRef(() => SubscriptionModule),
-    forwardRef(() => PerformerAssetsModule),
-    forwardRef(() => UtilsModule),
-    forwardRef(() => MailerModule),
-    forwardRef(() => BlockModule),
-    forwardRef(() => SettingModule),
-    forwardRef(() => SocketModule)
+  forwardRef(() => UserModule),
+  forwardRef(() => AuthModule),
+  forwardRef(() => FileModule),
+  forwardRef(() => SubscriptionModule),
+  forwardRef(() => PerformerAssetsModule),
+  forwardRef(() => UtilsModule),
+  forwardRef(() => MailerModule),
+  forwardRef(() => BlockModule),
+  forwardRef(() => SettingModule),
+  forwardRef(() => SocketModule)
   ],
   providers: [
-    ...performerProviders,
-    ...rankingPerformerProviders,
-    PerformerService,
-    PerformerSearchService,
-    PerformerBankingService,
-    PerformerAssetsListener,
-    PerformerConnectedListener,
-    UpdatePerformerStatusListener,
-    PerformerCacheService,
-    RankingPerformerService
+  ...performerProviders,
+  ...rankingPerformerProviders,
+  PerformerService,
+  PerformerSearchService,
+  PerformerBankingService,
+  PerformerAssetsListener,
+  PerformerConnectedListener,
+  UpdatePerformerStatusListener,
+  PerformerCacheService,
+  RankingPerformerService
   ],
   controllers: [
-    AdminPerformerController,
-    PerformerController,
-    AdminRankingPerformerController,
-    RankingPerformerController
+  AdminPerformerController,
+  PerformerController,
+  AdminRankingPerformerController,
+  RankingPerformerController
   ],
   exports: [
-    ...performerProviders,
-    PerformerService,
-    PerformerSearchService,
-    PerformerCacheService
+  ...performerProviders,
+  PerformerService,
+  PerformerSearchService,
+  PerformerCacheService
   ]
-})
+  })
 export class PerformerModule {}

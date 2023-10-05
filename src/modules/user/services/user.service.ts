@@ -260,8 +260,7 @@ export class UserService {
         _id: userId
       },
       {
-        verifiedEmail: true,
-        status: STATUS_ACTIVE
+        verifiedEmail: true
       }
     );
   }

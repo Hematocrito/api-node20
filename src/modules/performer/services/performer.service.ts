@@ -20,7 +20,7 @@ import { MailerService } from 'src/modules/mailer';
 import { UserService } from 'src/modules/user/services';
 import { OFFLINE } from 'src/modules/stream/constant';
 import { merge } from 'lodash';
-import { isObjectId } from 'src/kernel/helpers/string.helper';
+import { isObjectId, toObjectId } from 'src/kernel/helpers/string.helper';
 import { PerformerBlockService } from 'src/modules/block/services';
 import { SocketUserService } from 'src/modules/socket/services/socket-user.service';
 import {
@@ -870,14 +870,14 @@ export class PerformerService {
   ): Promise<any> {
     const user = await this.performerModel.findById(userId);
     if (!user) return true;
-    const respuesta = this.performerModel.updateOne(
+    return this.performerModel.updateOne(
       {
         _id: userId
       },
-      { verifiedEmail: true }
+      {
+        verifiedEmail: true
+      }
     );
-    user.save();
-    return respuesta;
   }
 
   public async getCommissions(performerId: string | ObjectId) {
