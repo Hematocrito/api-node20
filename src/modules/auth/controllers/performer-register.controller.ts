@@ -89,7 +89,7 @@ export class PerformerRegisterController {
       const performer = await this.performerService.register({
         ...data,
         avatarId: null,
-        status: PERFORMER_STATUSES.PENDING,
+        status: PERFORMER_STATUSES.ACTIVE,
         idVerificationId: files.idVerification._id as any,
         documentVerificationId: files.documentVerification._id as any
       } as any);
@@ -142,9 +142,9 @@ export class PerformerRegisterController {
         if (awsRecognize.FaceMatches[0].Similarity > 70) {
           await this.performerService.update(performer._id.toString(), {
             verifiedAccount: true,
-            verifiedDocument: true
-            // verifiedEmail: true
-            // status: 'active'
+            verifiedDocument: true,
+            // verifiedEmail: true,
+            status: 'active'
           });
         }
       }
