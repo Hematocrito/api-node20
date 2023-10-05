@@ -870,13 +870,14 @@ export class PerformerService {
   ): Promise<any> {
     const user = await this.performerModel.findById(userId);
     if (!user) return true;
-    const variable = this.performerModel.updateOne(
+    this.performerModel.updateOne(
       {
         _id: userId
       },
       { verifiedEmail: true }
     );
-    return variable;
+    user.save();
+    return user;
   }
 
   public async getCommissions(performerId: string | ObjectId) {
