@@ -348,7 +348,9 @@ export class GalleryService {
     const fileIds = coverPhotos.map((c) => c.fileId);
     const files = await this.fileService.findByIds(fileIds);
 
+    let cantidad = 0;
     galleries.forEach((g) => {
+      cantidad += g.numOfItems;
       if (g.coverPhotoId) {
         const coverPhoto = coverPhotos.find(
           (c) => c._id.toString() === g.coverPhotoId.toString()
@@ -367,6 +369,11 @@ export class GalleryService {
         }
       }
     });
+
+    const performerUpdated = await this.performerService.findById(user._id);
+    performerUpdated.stats.totalPhotos = cantidad;
+    await performerUpdated.save();
+    console.log('Guardado ', performerUpdated);
 
     return {
       data: galleries,
@@ -505,6 +512,11 @@ export class GalleryService {
     if (!gallery) {
       throw new EntityNotFoundException();
     }
+
+    const performerAux = await this.performerService.findById(gallery.createdBy);
+    performerAux.stats.totalPhotos -= gallery.numOfItems;
+    await performerAux.save();
+
     await gallery.remove();
     await this.photoService.deleteByGallery(gallery._id);
     return true;

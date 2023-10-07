@@ -46,7 +46,6 @@ export class PerformerFeedController {
     @CurrentUser() performer: UserDto,
     @Request() req: any
   ): Promise<DataResponse<PageableData<any>>> {
-    console.log('performer', performer);
     const auth = { _id: req.authUser.authId, source: req.authUser.source, sourceId: req.authUser.sourceId };
     const jwToken = await this.authService.generateJWT(auth, { expiresIn: 4 * 60 * 60 });
     const data = await this.feedService.search(query, performer, jwToken);
