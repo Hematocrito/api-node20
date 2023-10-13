@@ -224,6 +224,7 @@ export class PerformerSearchService {
         status: PERFORMER_STATUSES.ACTIVE
       })
       .limit(req.limit ? parseInt(req.limit as string, 10) : 10)
+      .skip(parseInt(req.offset as string, 10))
       .sort(sort);
 
     return {
