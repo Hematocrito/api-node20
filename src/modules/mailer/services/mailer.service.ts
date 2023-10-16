@@ -32,12 +32,12 @@ export class MailerService {
     this.init();
     this.transporter = nodemailer.createTransport(
       smtpTransport({
-        host: 'smtp.gmail.com',
+        host: 'email-smtp.us-east-1.amazonaws.com',
         port: 587,
         secure: false,
         auth: {
-          user: 'hitceate@gmail.com',
-          pass: 'kcdythrininubnyf'
+          user: 'AKIAQO7LFFDUM2UCIRZJ',
+          pass: 'BBOnws0cabt+0dSqlZ1Nr3IWO4w/oeQJQNW8Bp5xrUQy'
         }
       })
     );
