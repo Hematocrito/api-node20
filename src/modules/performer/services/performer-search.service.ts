@@ -203,6 +203,9 @@ export class PerformerSearchService {
   }
 
   public async searchForPerformer(req: PerformerSearchPayload, user: UserDto) {
+    const query = {
+      status: PERFORMER_STATUSES.ACTIVE
+    } as any;
     let sort = {
       createdAt: -1
     } as any;
@@ -219,17 +222,17 @@ export class PerformerSearchService {
       sort = '-stats.subscribers';
     }
 
-    const performers = await this.performerModel
-      .find({
-        status: PERFORMER_STATUSES.ACTIVE
-      })
-      .limit(req.limit ? parseInt(req.limit as string, 10) : 10)
-      .skip(parseInt(req.offset as string, 10))
-      .sort(sort);
-
+    const [data, total] = await Promise.all([
+      this.performerModel
+        .find(query)
+        .sort(sort)
+        .limit(req.limit ? parseInt(req.limit as string, 10) : 10)
+        .skip(parseInt(req.offset as string, 10)),
+      this.performerModel.countDocuments(query)
+    ]);
     return {
-      data: performers.map((item) => new PerformerDto(item).toResponse(false)),
-      total: performers.length
+      data: data.map((item) => new PerformerDto(item).toResponse(false)),
+      total
     };
   }
 
