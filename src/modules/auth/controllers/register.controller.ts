@@ -227,7 +227,7 @@ export class RegisterController {
       // send mail with defined transport object
       const info = await transporter.sendMail({
         from: process.env.SENDER_EMAIL, // sender address
-        to: 'aussonia@gmail.com', // list of receivers
+        to: 'marinav2001@hotmail.com', // list of receivers
         subject: 'Enviando email', // Subject line
         text: 'Todo funciona correctamente', // plain text body
         html: '<b>Romeo y Julieta</b>' // html body
