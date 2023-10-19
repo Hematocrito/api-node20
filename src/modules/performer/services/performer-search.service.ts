@@ -206,6 +206,68 @@ export class PerformerSearchService {
     const query = {
       status: PERFORMER_STATUSES.ACTIVE
     } as any;
+    if (req.q) {
+      const regexp = new RegExp(
+        req.q.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, ''),
+        'i'
+      );
+      query.$or = [
+        {
+          name: { $regex: regexp }
+        },
+        {
+          username: { $regex: regexp }
+        }
+      ];
+    }
+    [
+      'hair',
+      'pubicHair',
+      'ethnicity',
+      'country',
+      'bodyType',
+      'gender',
+      'height',
+      'weight',
+      'eyes',
+      'butt',
+      'agentId',
+      'sexualPreference'
+    ].forEach((f) => {
+      if (req[f]) {
+        query[f] = req[f];
+      }
+    });
+
+    // Si hay usuario logueado entra aquí
+    if (user) {
+      // no equal: mostrar performers diferentes al usuario loqueado
+      query._id = { $ne: user._id };
+    }
+
+    // Si hay performersIds entra acá
+    if (req.performerIds) {
+      query._id = Array.isArray(req.performerIds) ? { $in: req.performerIds } : { $in: [req.performerIds] };
+    }
+    if (req.age) {
+      const fromAge = req.age.split('_')[0];
+      const toAge = req.age.split('_')[1];
+      const fromDate = moment().subtract(toAge, 'years').startOf('day').toDate();
+      const toDate = moment().subtract(fromAge, 'years').startOf('day').toDate();
+      query.dateOfBirth = {
+        $gte: fromDate,
+        $lte: toDate
+      };
+    }
+    if (req.gender) {
+      query.gender = req.gender;
+    }
+    if (req.isStreaming) {
+      query.streamingStatus = {
+        $ne: OFFLINE
+      };
+    }
+
     let sort = {
       createdAt: -1
     } as any;
