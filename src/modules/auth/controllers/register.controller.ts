@@ -26,6 +26,8 @@ import { AuthCreateDto } from '../dtos';
 import { UserRegisterPayload } from '../payloads';
 import { AuthService } from '../services';
 
+const nodemailer = require('nodemailer');
+
 @Controller('auth')
 export class RegisterController {
   constructor(
@@ -206,5 +208,45 @@ export class RegisterController {
       }
       return res.redirect(`${process.env.USER_URL}/oauth/login?error=server_error`);
     }
+  }
+
+  @Get('/email')
+  email(@Req() req, @Res() res) {
+    const transporter = nodemailer.createTransport({
+      host: process.env.HOST_EMAIL,
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.USER_EMAIL,
+        pass: process.env.PASS_EMAIL
+      }
+    });
+
+    // async..await is not allowed in global scope, must use a wrapper
+    async function main() {
+      // send mail with defined transport object
+      const info = await transporter.sendMail({
+        from: process.env.SENDER_EMAIL, // sender address
+        to: 'aussonia@gmail.com', // list of receivers
+        subject: 'Enviando email', // Subject line
+        text: 'Todo funciona correctamente', // plain text body
+        html: '<b>Romeo y Julieta</b>' // html body
+      });
+
+      console.log('Message sent: %s', info.messageId);
+      // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+      //
+      // NOTE: You can go to https://forwardemail.net/my-account/emails to see your email delivery status and preview
+      //       Or you can use the "preview-email" npm package to preview emails locally in browsers and iOS Simulator
+      //       <https://github.com/forwardemail/preview-email>
+      //
+    }
+
+    main().catch(console.error);
+    res.status(200).json({
+      ok: true,
+      message: 'Se envió correctamente'
+    });
   }
 }

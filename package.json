@@ -58,7 +58,7 @@
     "mustache": "^4.0.0",
     "nestjs-config": "^1.4.5",
     "nestjs-redis": "^1.2.7",
-    "nodemailer": "^6.4.4",
+    "nodemailer": "^6.9.6",
     "nodemailer-smtp-transport": "^2.7.4",
     "passport": "^0.6.0",
     "passport-google-oauth2": "^0.2.0",

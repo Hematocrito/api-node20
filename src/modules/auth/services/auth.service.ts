@@ -351,6 +351,7 @@ export class AuthService {
     //   template
     // });
     await this.mailService.sendEmail({
+      from: process.env.SENDER_EMAIL,
       to: source.email,
       subject: 'Verify your email address',
       data: {
@@ -437,10 +438,7 @@ export class AuthService {
         </p>
         <a href="${verificationLink}" target="_blank">Yes, it's me</a>
         <span></span>
-        <p style="font-size: 14px; margin-left: 45px; margin-right: 40px; margin-top: 30px;">
-          By verifying your email address, you confirm your registration and that you are over 18 years of age. We will use
-          this email address to keep you abreast of product updates, important information about your account, news and special offers.
-        </p>
+        
         <p style="color: #00B2FF; margin-top: 30px; margin-bottom: 20px; text-align: center;">${verificationLink}</p>
       </body>
       </html>`
