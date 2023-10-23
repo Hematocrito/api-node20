@@ -267,23 +267,7 @@ export class PerformerSearchService {
         $ne: OFFLINE
       };
     }
-    const activePerformers = await this.performerCacheService.getActivePerformers();
-    if (query.performerId || query.performerIds) {
-      // check if exist in the active list
-      const hasItem = activePerformers.includes(
-        query.performerId || query.performerIds
-      );
-      if (!hasItem) {
-        return {
-          data: [],
-          total: 0
-        };
-      }
-    } else {
-      query._id = {
-        $in: activePerformers
-      };
-    }
+
     let sort = {
       createdAt: -1
     } as any;
