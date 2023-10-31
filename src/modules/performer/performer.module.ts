@@ -30,6 +30,7 @@ import { RankingPerformerService } from './services/ranking-performer.service';
 import { AdminRankingPerformerController } from './controllers/admin-ranking-performer.controller';
 import { RankingPerformerController } from './controllers/ranking-performer.controller';
 import { SocketModule } from '../socket/socket.module';
+import { FeedModule } from '../feed/feed.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { SocketModule } from '../socket/socket.module';
   forwardRef(() => UserModule),
   forwardRef(() => AuthModule),
   forwardRef(() => FileModule),
+  forwardRef(() => FeedModule),
   forwardRef(() => SubscriptionModule),
   forwardRef(() => PerformerAssetsModule),
   forwardRef(() => UtilsModule),

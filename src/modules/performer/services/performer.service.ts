@@ -23,6 +23,10 @@ import { merge } from 'lodash';
 import { isObjectId, toObjectId } from 'src/kernel/helpers/string.helper';
 import { PerformerBlockService } from 'src/modules/block/services';
 import { SocketUserService } from 'src/modules/socket/services/socket-user.service';
+import { FEED_PROVIDER } from 'src/modules/feed/providers';
+import { FeedModel } from 'src/modules/feed/models';
+import { GalleryModel, PhotoModel, VideoModel } from 'src/modules/performer-assets/models';
+import { PERFORMER_GALLERY_MODEL_PROVIDER, PERFORMER_PHOTO_MODEL_PROVIDER, PERFORMER_VIDEO_MODEL_PROVIDER } from 'src/modules/performer-assets/providers';
 import {
   PERFORMER_UPDATE_STATUS_CHANNEL, DELETE_PERFORMER_CHANNEL, PERFORMER_CHANNEL, PERFORMER_STATUSES
 } from '../constants';
@@ -66,6 +70,14 @@ export class PerformerService {
     private readonly subscriptionService: SubscriptionService,
     @Inject(PERFORMER_MODEL_PROVIDER)
     private readonly performerModel: Model<PerformerModel>,
+    @Inject(FEED_PROVIDER)
+    private readonly feedModel: Model<FeedModel>,
+    @Inject(PERFORMER_VIDEO_MODEL_PROVIDER)
+    private readonly videoModel: Model<VideoModel>,
+    @Inject(PERFORMER_GALLERY_MODEL_PROVIDER)
+    private readonly galleryModel: Model<GalleryModel>,
+    @Inject(PERFORMER_PHOTO_MODEL_PROVIDER)
+    private readonly photoModel: Model<PhotoModel>,
     private readonly queueEventService: QueueEventService,
     private readonly mailService: MailerService,
     @Inject(PERFORMER_PAYMENT_GATEWAY_SETTING_MODEL_PROVIDER)
@@ -296,11 +308,24 @@ export class PerformerService {
     const performer = await this.performerModel.findById(id);
     if (!performer) throw new EntityNotFoundException();
     await this.performerModel.deleteOne({ _id: id });
+
+    // Feeds relcionados
+    await this.feedModel.deleteMany({ fromSourceId: id });
+
+    // Videos relacionados
+    await this.videoModel.deleteMany({ createdBy: id });
+
+    // Galerías realcionadas
+    await this.galleryModel.deleteMany({ createdBy: id });
+
+    // Fotos relacionadas
+    await this.photoModel.deleteMany({ performerId: id });
+    /*
     await this.queueEventService.publish(new QueueEvent({
       channel: DELETE_PERFORMER_CHANNEL,
       eventName: EVENT.DELETED,
       data: new PerformerDto(performer).toResponse()
-    }));
+    })); */
     return { deleted: true };
   }
 
