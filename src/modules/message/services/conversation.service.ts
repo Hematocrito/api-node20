@@ -58,8 +58,8 @@ export class ConversationService {
   }
 
   public async createPrivateConversation(
-    sender: IRecipient,
-    receiver: IRecipient
+    sender: any,
+    receiver: any
   ): Promise<ConversationDto> {
     let conversation = await this.conversationModel
       .findOne({
