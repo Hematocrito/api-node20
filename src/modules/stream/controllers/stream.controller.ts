@@ -50,8 +50,15 @@ export class StreamController {
   @UseInterceptors(UserInterceptor)
   @UsePipes(new ValidationPipe({ transform: true }))
   async join(@Param('id') performerId: string) {
+    console.log('Paso 1');
     const data = await this.streamService.joinPublicChat(performerId);
+    console.log('Data ', data);
     return DataResponse.ok(data);
+  }
+
+  @Get('/test')
+  saludito(): string {
+    return 'Mi corazón soporta el peso abrumador de sus rigores';
   }
 
   @Post('/private-chat/:id')

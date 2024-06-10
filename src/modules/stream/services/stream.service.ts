@@ -143,6 +143,7 @@ export class StreamService {
       performerId,
       type: PUBLIC_CHAT
     });
+    console.log('Stream ', stream);
     if (!stream) {
       throw new EntityNotFoundException();
     }
